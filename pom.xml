@@ -213,4 +213,10 @@
 
     </dependencies>
 
+    <properties>
+      <sonar.projectKey>ckelleyRH_pki</sonar.projectKey>
+      <sonar.organization>ckelleyrh</sonar.organization>
+      <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    </properties>
+
 </project>
