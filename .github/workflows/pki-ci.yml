@@ -1,4 +1,4 @@
-name: ACME Tests
+name: PKI Tests
 
 on: [push, pull_request]
 
