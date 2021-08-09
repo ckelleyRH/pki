@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import com.netscape.certsrv.account.Account;
 import com.netscape.certsrv.account.AccountClient;
 import com.netscape.certsrv.authentication.EAuthException;
+import com.netscape.cmsutil.json.JSONObject;
 import com.netscape.cmsutil.xml.XMLObject;
 
 
@@ -174,9 +175,9 @@ public class SubsystemClient extends Client {
         }
 
         ByteArrayInputStream bis = new ByteArrayInputStream(response.getBytes());
-        XMLObject parser = new XMLObject(bis);
+        JSONObject parser = new JSONObject(bis);
 
-        String status = parser.getValue("Status");
+        String status = parser.getJsonNode().get("Status").asText();
         logger.debug("SubsystemClient: Status: " + status);
 
         if (status.equals(AUTH_FAILURE)) {
@@ -184,7 +185,7 @@ public class SubsystemClient extends Client {
         }
 
         if (!status.equals(SUCCESS)) {
-            String error = parser.getValue("Error");
+            String error = parser.getJsonNode().get("Error").asText();
             throw new IOException(error);
         }
 
