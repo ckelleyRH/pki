@@ -19,7 +19,7 @@ import org.dogtagpki.cli.CommandCLI;
 
 import com.netscape.certsrv.client.PKIClient;
 import com.netscape.cmstools.cli.MainCLI;
-import com.netscape.cmsutil.xml.XMLObject;
+import com.netscape.cmsutil.json.JSONObject;
 
 /**
  * @author Endi S. Dewata
@@ -134,9 +134,9 @@ public class SecurityDomainJoinCLI extends CommandCLI {
         }
 
         ByteArrayInputStream bis = new ByteArrayInputStream(response.getBytes());
-        XMLObject obj = new XMLObject(bis);
+        JSONObject obj = new JSONObject(bis);
 
-        String status = obj.getValue("Status");
+        String status = obj.getJsonNode().get("Status").asText();
         logger.info("Status: " + status);
 
         if (status.equals("0")) {
@@ -147,7 +147,7 @@ public class SecurityDomainJoinCLI extends CommandCLI {
             throw new Exception("Authentication failure");
         }
 
-        String error = obj.getValue("Error");
+        String error = obj.getJsonNode().get("Error").asText();
         throw new Exception(error);
     }
 }
