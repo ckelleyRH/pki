@@ -14,19 +14,8 @@ public class CMSRequestInfoTest {
     public void setUpBefore() {
         before.setRequestType("securityDataEnrollment");
         before.setRequestStatus(RequestStatus.COMPLETE);
-    }
-
-    @Test
-    public void testXML() throws Exception {
-        // Act
-        String xml = before.toXML();
-        System.out.println("XML (before): " + xml);
-
-        CMSRequestInfo afterXML = CMSRequestInfo.fromXML(xml);
-        System.out.println("XML (after): " + afterXML.toXML());
-
-        // Assert
-        Assert.assertEquals(before, afterXML);
+        before.setRealm("Foo");
+        before.setRequestURL("https://www.example.com/123");
     }
 
     @Test
