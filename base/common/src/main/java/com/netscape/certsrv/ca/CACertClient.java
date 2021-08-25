@@ -47,7 +47,7 @@ import com.netscape.certsrv.dbs.certdb.CertId;
 import com.netscape.certsrv.profile.ProfileDataInfos;
 import com.netscape.certsrv.request.RequestId;
 import com.netscape.cmsutil.crypto.CryptoUtil;
-import com.netscape.cmsutil.xml.XMLObject;
+import com.netscape.cmsutil.json.JSONObject;
 
 /**
  * @author Endi S. Dewata
@@ -244,9 +244,9 @@ public class CACertClient extends Client {
         }
 
         ByteArrayInputStream bis = new ByteArrayInputStream(response.getBytes());
-        XMLObject parser = new XMLObject(bis);
+        JSONObject parser = new JSONObject(bis);
 
-        String status = parser.getValue("Status");
+        String status = parser.getJsonNode().get("Status").asText();
         logger.info("CACertClient: Status: " + status);
 
         if (status.equals("2")) {
@@ -255,18 +255,18 @@ public class CACertClient extends Client {
         }
 
         if (!status.equals("0")) {
-            String error = parser.getValue("Error");
+            String error = parser.getJsonNode().get("Error").asText();
             logger.error("Unable to generate certificate: " + error);
             throw new IOException("Unable to generate certificate: " + error);
         }
 
-        String id = parser.getValue("Id");
+        String id = parser.getJsonNode().get("Id").asText();
         logger.info("CACertClient: Request ID: " + id);
 
-        String serial = parser.getValue("serialno");
+        String serial = parser.getJsonNode().get("serialno").asText();
         logger.info("CACertClient: Serial: " + serial);
 
-        String b64 = parser.getValue("b64");
+        String b64 = parser.getJsonNode().get("b64").asText();
         logger.info("CACertClient: Cert: " + b64);
 
         b64 = CryptoUtil.stripCertBrackets(b64.trim());
