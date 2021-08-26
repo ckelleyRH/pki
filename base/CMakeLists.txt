@@ -144,14 +144,6 @@ find_file(JACKSON2_JAXRS_JSON_PROVIDER_JAR
         /usr/share/java
 )
 
-find_file(JACKSON2_JAXB_ANNOTATIONS_JAR
-    NAMES
-        jackson-module-jaxb-annotations.jar
-    PATHS
-        /usr/share/java/jackson-modules
-        /usr/share/java
-)
-
 find_file(JAXB_API_JAR
     NAMES
         jaxb-api.jar
