@@ -152,13 +152,6 @@ find_file(JACKSON2_JAXB_ANNOTATIONS_JAR
         /usr/share/java
 )
 
-find_file(JAXB_API_JAR
-    NAMES
-        jaxb-api.jar
-    PATHS
-        /usr/share/java
-)
-
 find_file(JAKARTA_ACTIVATION_JAR
     NAMES
         jakarta.activation.jar

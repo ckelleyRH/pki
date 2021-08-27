@@ -44,10 +44,6 @@ grant codeBase "file:/usr/share/java/glassfish-jsp.jar" {
         permission java.security.AllPermission;
 };
 
-grant codeBase "file:/usr/share/java/jaxb-api.jar" {
-        permission java.security.AllPermission;
-};
-
 grant codeBase "file:/usr/share/java/jakarta-activation/jakarta.activation.jar" {
         permission java.security.AllPermission;
 };
