@@ -98,6 +98,7 @@ class PKICLI(pki.cli.CLI):
 
         java_path = os.getenv('PKI_JAVA_PATH')
         java_home = os.getenv('JAVA_HOME')
+        fips_enabled = os.getenv('FIPS_ENABLED')
         pki_lib = os.getenv('PKI_LIB')
         logging_config = os.getenv('PKI_LOGGING_CONFIG')
 
@@ -144,6 +145,7 @@ class PKICLI(pki.cli.CLI):
         elif logger.isEnabledFor(logging.INFO):
             cmd.extend(['-v'])
 
+        cmd.extend('-Dcom.redhat.fips=false')
         cmd.extend(args)
 
         logger.info('Java command: %s', ' '.join(cmd))
