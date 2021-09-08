@@ -83,7 +83,7 @@ jobs:
           tests/bin/runner-init.sh
 
       - name: Install dependencies
-        run: docker exec pki dnf install -y 389-ds-base
+        run: docker exec pki dnf install -y 389-ds-base jaxb-api
 
       - name: Install DS
         run: docker exec pki ${PKIDIR}/tests/bin/ds-create.sh
@@ -168,7 +168,7 @@ jobs:
         run: docker network connect example primary --alias primary.example.com
 
       - name: Install dependencies in primary container
-        run: docker exec primary dnf install -y 389-ds-base
+        run: docker exec primary dnf install -y 389-ds-base jaxb-api
 
       - name: Install DS in primary container
         run: docker exec primary ${PKIDIR}/tests/bin/ds-create.sh
@@ -190,7 +190,7 @@ jobs:
         run: docker network connect example secondary --alias secondary.example.com
 
       - name: Install dependencies in secondary container
-        run: docker exec secondary dnf install -y 389-ds-base
+        run: docker exec secondary dnf install -y 389-ds-base jaxb-api
 
       - name: Install DS in secondary container
         run: docker exec secondary ${PKIDIR}/tests/bin/ds-create.sh
@@ -230,7 +230,7 @@ jobs:
         run: docker network connect example tertiary --alias tertiary.example.com
 
       - name: Install dependencies in tertiary container
-        run: docker exec tertiary dnf install -y 389-ds-base
+        run: docker exec tertiary dnf install -y 389-ds-base jaxb-api
 
       - name: Install DS in tertiary container
         run: docker exec tertiary ${PKIDIR}/tests/bin/ds-create.sh

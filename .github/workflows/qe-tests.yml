@@ -92,7 +92,7 @@ jobs:
           tests/bin/runner-init.sh
 
       - name: Install dependencies in master container
-        run: docker exec pki1 dnf install -y 389-ds-base python3-pip
+        run: docker exec pki1 dnf install -y 389-ds-base python3-pip jaxb-api
 
       - name: Set up inventory
         run: |
