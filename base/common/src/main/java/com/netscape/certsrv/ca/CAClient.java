@@ -44,7 +44,7 @@ import com.netscape.cmsutil.xml.XMLObject;
 
 public class CAClient extends SubsystemClient {
 
-    public final static Logger logger = LoggerFactory.getLogger(CAClient.class);
+    public static final Logger logger = LoggerFactory.getLogger(CAClient.class);
 
     public CAClient(PKIClient client) throws Exception {
         super(client, "ca");
