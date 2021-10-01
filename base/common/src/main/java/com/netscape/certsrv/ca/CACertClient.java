@@ -19,16 +19,20 @@ package com.netscape.certsrv.ca;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.cert.CertificateException;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.mozilla.jss.netscape.security.x509.X500Name;
 import org.mozilla.jss.netscape.security.x509.X509CertImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.netscape.certsrv.authentication.EAuthException;
 import com.netscape.certsrv.cert.CertData;
 import com.netscape.certsrv.cert.CertDataInfos;
@@ -47,6 +51,7 @@ import com.netscape.certsrv.dbs.certdb.CertId;
 import com.netscape.certsrv.profile.ProfileDataInfos;
 import com.netscape.certsrv.request.RequestId;
 import com.netscape.cmsutil.crypto.CryptoUtil;
+import com.netscape.cmsutil.json.JSONObject;
 import com.netscape.cmsutil.xml.XMLObject;
 
 /**
@@ -244,6 +249,46 @@ public class CACertClient extends Client {
         }
 
         ByteArrayInputStream bis = new ByteArrayInputStream(response.getBytes());
+        try {
+            return processJSONResponse(bis);
+        } catch (Exception e) {
+            return processXMLResponse(bis);
+        }
+    }
+
+    private X509CertImpl processJSONResponse(ByteArrayInputStream bis) throws CertificateException, EAuthException, IOException {
+        JSONObject jsonObj = new JSONObject(bis);
+        JsonNode responseNode = jsonObj.getJsonNode().get("Response");
+        String status = responseNode.get("Status").asText();
+
+        logger.info("CACertClient: Status: " + status);
+
+        if (status.equals("2")) {
+            logger.error("Authentication failure");
+            throw new EAuthException("Authentication failure");
+        }
+
+        if (!status.equals("0")) {
+            String error = jsonObj.getJsonNode().get("Error").asText();
+            logger.error("Unable to generate certificate: " + error);
+            throw new IOException("Unable to generate certificate: " + error);
+        }
+        String id = responseNode.get("Id").asText();
+        logger.info("CACertClient: Request ID: " + id);
+
+        String serial = responseNode.get("serialno").asText();
+        logger.info("CACertClient: Serial: " + serial);
+
+        String b64 = responseNode.get("b64").asText();
+        logger.info("CACertClient: Cert: " + b64);
+
+        b64 = CryptoUtil.stripCertBrackets(b64.trim());
+        byte[] bytes = CryptoUtil.base64Decode(b64);
+        return new X509CertImpl(bytes);
+    }
+
+    @Deprecated(since = "11.0.0", forRemoval = true)
+    private X509CertImpl processXMLResponse(ByteArrayInputStream bis) throws SAXException, IOException, ParserConfigurationException, EAuthException, CertificateException {
         XMLObject parser = new XMLObject(bis);
 
         String status = parser.getValue("Status");

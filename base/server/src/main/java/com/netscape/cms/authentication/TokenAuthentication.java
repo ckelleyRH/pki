@@ -29,6 +29,7 @@ import org.dogtagpki.server.authentication.AuthManager;
 import org.dogtagpki.server.authentication.AuthManagerConfig;
 import org.dogtagpki.server.authentication.AuthToken;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.netscape.certsrv.authentication.EInvalidCredentials;
 import com.netscape.certsrv.authentication.EMissingCredential;
 import com.netscape.certsrv.authentication.IAuthCredentials;
@@ -46,7 +47,7 @@ import com.netscape.cms.servlet.csadmin.Configurator;
 import com.netscape.cmscore.apps.CMS;
 import com.netscape.cmscore.apps.CMSEngine;
 import com.netscape.cmscore.apps.EngineConfig;
-import com.netscape.cmsutil.xml.XMLObject;
+import com.netscape.cmsutil.json.JSONObject;
 
 /**
  * Token authentication.
@@ -164,7 +165,7 @@ public class TokenAuthentication implements ProfileAuthenticator {
             // formatted response which will throw an exception during parsing
             if (c != null) {
                 @SuppressWarnings("unused")
-                XMLObject parser = new XMLObject(new ByteArrayInputStream(c.getBytes()));
+                JSONObject parser = new JSONObject(new ByteArrayInputStream(c.getBytes()));
             }
 
         } catch (Exception e) {
@@ -176,26 +177,26 @@ public class TokenAuthentication implements ProfileAuthenticator {
         if (c != null) {
             try {
                 ByteArrayInputStream bis = new ByteArrayInputStream(c.getBytes());
-                XMLObject parser = null;
+                JSONObject parser = null;
 
                 try {
-                    parser = new XMLObject(bis);
+                    parser = new JSONObject(bis);
                 } catch (Exception e) {
                     logger.error("TokenAuthentication::authenticate() - "
                              + "Exception=" + e.getMessage(), e);
                     throw new EBaseException(e.toString());
                 }
-                String status = parser.getValue("Status");
+                JsonNode responseNode = parser.getJsonNode().get("Response");
+                String status = responseNode.get("Status").asText();
 
                 logger.debug("TokenAuthentication: status=" + status);
                 if (!status.equals("0")) {
-                    String error = parser.getValue("Error");
+                    String error = parser.getJsonNode().get("Error").asText();
                     logger.error("TokenAuthentication: error: " + error);
                     throw new EBaseException(error);
                 }
-
-                String uid = parser.getValue("uid");
-                String gid = parser.getValue("gid");
+                String uid = responseNode.get("uid").asText();
+                String gid = responseNode.get("gid").asText();
                 String[] groups = {gid};
 
                 authToken.set(IAuthToken.UID, uid);
