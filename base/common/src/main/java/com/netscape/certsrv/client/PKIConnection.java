@@ -73,9 +73,13 @@ import org.mozilla.jss.ssl.SSLHandshakeCompletedEvent;
 import org.mozilla.jss.ssl.SSLSocket;
 import org.mozilla.jss.ssl.SSLSocketListener;
 
+import com.netscape.cms.logging.Logger;
+import com.netscape.cms.logging.SignedAuditLogger;
+
 public class PKIConnection implements AutoCloseable {
 
     public static org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(PKIConnection.class);
+    private static Logger signedAuditLogger = SignedAuditLogger.getLogger();
 
     ClientConfig config;
 
@@ -331,7 +335,13 @@ public class PKIConnection implements AutoCloseable {
             String certNickname = config.getCertNickname();
             if (certNickname != null) {
                 logger.info("Client certificate: "+certNickname);
-                socket.setClientCertNickname(certNickname);
+                try {
+                    socket.setClientCertNickname(certNickname);
+                } catch (Exception e) {
+                    signedAuditLogger.log("I gots me an Exception! " + e.getMessage());
+                    logger.error("I gots me an Exception! ", e);
+                    throw e;
+                }
             }
 
             socket.addSocketListener(new SSLSocketListener() {
