@@ -185,7 +185,7 @@ jobs:
 
       - name: Verify certbot in client container
         run: |
-          docker exec client certbot register \
+          docker exec client certbot register  \
               --server http://pki.example.com:8080/acme/directory \
               --email user1@example.com \
               --agree-tos \
@@ -474,17 +474,17 @@ jobs:
 
       - name: Verify certbot in client container
         run: |
-          docker exec client certbot register \
+          docker exec client certbot register -v \
               --server http://pki.example.com:8080/acme/directory \
               --email user1@example.com \
               --agree-tos \
               --non-interactive
-          docker exec client certbot certonly \
+          docker exec client certbot certonly -v \
               --server http://pki.example.com:8080/acme/directory \
               -d client.example.com \
               --standalone \
               --non-interactive
-          docker exec client certbot renew \
+          docker exec client certbot renew -v \
               --server http://pki.example.com:8080/acme/directory \
               --cert-name client.example.com \
               --force-renewal \
@@ -500,11 +500,11 @@ jobs:
           #     --cert-name client.example.com \
           #     --non-interactive
           #
-          docker exec client certbot update_account \
+          docker exec client certbot update_account -v \
               --server http://pki.example.com:8080/acme/directory \
               --email user2@example.com \
               --non-interactive
-          docker exec client certbot unregister \
+          docker exec client certbot unregister -v \
               --server http://pki.example.com:8080/acme/directory \
               --non-interactive
 
