@@ -183,6 +183,10 @@ jobs:
       - name: Install dependencies in client container
         run: docker exec client dnf install -y certbot
 
+      - name: Check ACME server is ready
+        run: |
+          tests/bin/check-acme-server-ready.sh
+
       - name: Verify certbot in client container
         run: |
           docker exec client certbot register \
@@ -336,6 +340,10 @@ jobs:
       - name: Install dependencies in client container
         run: docker exec client dnf install -y certbot jq
 
+      - name: Check ACME server is ready
+        run: |
+          tests/bin/check-acme-server-ready.sh
+
       - name: Verify ACME directory before switchover
         run: |
           echo http://server1.example.com:8080/acme/new-nonce > expected
@@ -477,9 +485,12 @@ jobs:
       - name: Install dependencies in client container
         run: docker exec client dnf install -y certbot
 
+      - name: Check ACME server is ready
+        run: |
+          tests/bin/check-acme-server-ready.sh
+
       - name: Verify certbot in client container
         run: |
-          docker exec client bash -c "curl -I http://pki.example.com:8080/acme/directory"
           docker exec client certbot register \
               --server http://pki.example.com:8080/acme/directory \
               --email user1@example.com \
