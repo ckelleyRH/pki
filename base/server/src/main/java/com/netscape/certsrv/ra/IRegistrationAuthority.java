@@ -19,7 +19,6 @@ package com.netscape.certsrv.ra;
 
 import java.util.Enumeration;
 
-import org.dogtagpki.legacy.policy.IPolicyProcessor;
 import org.mozilla.jss.netscape.security.x509.X500Name;
 
 import com.netscape.certsrv.base.EBaseException;
@@ -50,12 +49,6 @@ public interface IRegistrationAuthority extends ISubsystem {
     public final static String PROP_CERT_ISSUED_SUBSTORE = "certIssued";
     public final static String PROP_CERT_REVOKED_SUBSTORE = "certRevoked";
     public final static String PROP_REQ_IN_Q_SUBSTORE = "requestInQ";
-
-    /**
-     * Retrieves the policy processor of this registration authority.
-     * @return RA's policy processor
-     */
-    public IPolicyProcessor getPolicyProcessor();
 
     /**
      * Retrieves the RA certificate.

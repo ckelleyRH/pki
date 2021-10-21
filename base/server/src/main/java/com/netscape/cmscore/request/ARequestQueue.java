@@ -23,12 +23,10 @@ import java.util.Enumeration;
 import com.netscape.certsrv.base.EBaseException;
 import com.netscape.certsrv.base.SessionContext;
 import com.netscape.certsrv.request.INotify;
-import com.netscape.certsrv.request.IPolicy;
 import com.netscape.certsrv.request.IRequest;
 import com.netscape.certsrv.request.IRequestList;
 import com.netscape.certsrv.request.IRequestScheduler;
 import com.netscape.certsrv.request.IService;
-import com.netscape.certsrv.request.PolicyResult;
 import com.netscape.certsrv.request.RequestId;
 import com.netscape.certsrv.request.RequestStatus;
 import com.netscape.cmscore.apps.CMS;
@@ -74,7 +72,6 @@ public abstract class ARequestQueue {
 
     // RequestIDTable mTable = new RequestIDTable();
 
-    IPolicy mPolicy;
     IService mService;
     INotify mNotify;
     INotify mPendingNotify;
@@ -82,9 +79,8 @@ public abstract class ARequestQueue {
     IRequestScheduler mRequestScheduler;
 
     // Constructor
-    protected ARequestQueue(IPolicy policy, IService service, INotify notify,
+    protected ARequestQueue(IService service, INotify notify,
             INotify pendingNotify) {
-        mPolicy = policy;
         mService = service;
         mNotify = notify;
         mPendingNotify = pendingNotify;
@@ -392,26 +388,7 @@ public abstract class ARequestQueue {
             RequestStatus rs = r.getRequestStatus();
 
             if (rs == RequestStatus.BEGIN) {
-                PolicyResult pr = PolicyResult.ACCEPTED;
-
-                if (mPolicy != null)
-                    pr = mPolicy.apply(r);
-
-                if (pr == PolicyResult.ACCEPTED) {
-                    r.setRequestStatus(RequestStatus.APPROVED);
-                } else if (pr == PolicyResult.DEFERRED) {
-                    r.setRequestStatus(RequestStatus.PENDING);
-                } else {
-                    r.setRequestStatus(RequestStatus.REJECTED);
-                }
-
-                // if policy accepts the request, the request
-                // will be processed right away. So speed up
-                // the request processing, we do not want to
-                // have too many db operation.
-                if (pr != PolicyResult.ACCEPTED) {
-                    updateRequest(r);
-                }
+                r.setRequestStatus(RequestStatus.APPROVED);
             } else if (rs == RequestStatus.PENDING) {
                 if (mPendingNotify != null)
                     mPendingNotify.notify(r);

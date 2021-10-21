@@ -37,7 +37,6 @@ import java.util.TreeSet;
 import javax.servlet.annotation.WebListener;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dogtagpki.legacy.ca.CAPolicy;
 import org.mozilla.jss.CryptoManager;
 import org.mozilla.jss.crypto.PrivateKey;
 import org.mozilla.jss.netscape.security.x509.CertificateChain;
@@ -112,7 +111,6 @@ public class CAEngine extends CMSEngine {
     protected CRLRepository crlRepository;
     protected ReplicaIDRepository replicaIDRepository;
 
-    protected CAPolicy caPolicy;
     protected CAService caService;
 
     protected CertificateVersion defaultCertVersion;
@@ -213,10 +211,6 @@ public class CAEngine extends CMSEngine {
 
     public ReplicaIDRepository getReplicaIDRepository() {
         return replicaIDRepository;
-    }
-
-    public CAPolicy getCAPolicy() {
-        return caPolicy;
     }
 
     public CAService getCAService() {
@@ -780,11 +774,6 @@ public class CAEngine extends CMSEngine {
         maxNonces = caConfig.getInteger("maxNumberOfNonces", 100);
         logger.info("CAEngine: - max nonces: " + maxNonces);
 
-        logger.info("CAEngine: Initializing CA policy");
-        IConfigStore caPolicyConfig = caConfig.getSubStore(CertificateAuthority.PROP_POLICY);
-        caPolicy = new CAPolicy();
-        caPolicy.init(hostCA, caPolicyConfig);
-
         logger.info("CAEngine: Initializing CA service");
         caService = new CAService(hostCA);
 
@@ -807,7 +796,6 @@ public class CAEngine extends CMSEngine {
         requestQueue = new RequestQueue(
                 dbSubsystem,
                 requestRepository,
-                caPolicy,
                 caService,
                 requestNotifier,
                 pendingNotifier);

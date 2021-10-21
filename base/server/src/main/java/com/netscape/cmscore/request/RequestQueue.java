@@ -26,11 +26,9 @@ import com.netscape.certsrv.base.EBaseException;
 import com.netscape.certsrv.dbs.IDBSearchResults;
 import com.netscape.certsrv.request.AgentApprovals;
 import com.netscape.certsrv.request.INotify;
-import com.netscape.certsrv.request.IPolicy;
 import com.netscape.certsrv.request.IRequest;
 import com.netscape.certsrv.request.IRequestList;
 import com.netscape.certsrv.request.IService;
-import com.netscape.certsrv.request.PolicyResult;
 import com.netscape.certsrv.request.RequestId;
 import com.netscape.certsrv.request.RequestStatus;
 import com.netscape.cmscore.dbs.DBSSession;
@@ -47,10 +45,6 @@ public class RequestQueue extends ARequestQueue {
     /**
      * Create a request queue.
      *
-     * @param policy
-     *            A policy enforcement module. This object is called to make
-     *            adjustments to the request, and decide whether it needs agent
-     *            approval.
      * @param service
      *            The service object. This object actually performs the request
      *            after it is finalized and approved.
@@ -67,13 +61,12 @@ public class RequestQueue extends ARequestQueue {
     public RequestQueue(
             DBSubsystem dbSubsystem,
             RequestRepository requestRepository,
-            IPolicy policy,
             IService service,
             INotify notifier,
             INotify pendingNotifier)
             throws EBaseException {
 
-        super(policy, service, notifier, pendingNotifier);
+        super(service, notifier, pendingNotifier);
 
         this.dbSubsystem = dbSubsystem;
         this.mRepository = requestRepository;
@@ -207,16 +200,7 @@ public class RequestQueue extends ARequestQueue {
 
         aas.addApproval(agentName);
         request.setExtData(AgentApprovals.class.getName(), aas.toStringVector());
-
-        PolicyResult pr = mPolicy.apply(request);
-
-        if (pr == PolicyResult.ACCEPTED) {
-            request.setRequestStatus(RequestStatus.APPROVED);
-
-        } else if (pr == PolicyResult.DEFERRED || pr == PolicyResult.REJECTED) {
-            // ignore
-        }
-
+        request.setRequestStatus(RequestStatus.APPROVED);
         updateRequest(request);
         stateEngine(request);
     }
