@@ -97,6 +97,9 @@ jobs:
       - name: Connect PKI container to network
         run: docker network connect example pki --alias pki.example.com
 
+      - name: Set System Wide Crypto Policy to FUTURE
+        run: docker exec pki update-crypto-policies --set FUTURE
+
       - name: Install CA
         run: |
           docker exec pki pkispawn \
