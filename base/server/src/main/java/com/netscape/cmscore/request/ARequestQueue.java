@@ -63,14 +63,12 @@ import com.netscape.cmscore.apps.CMSEngine;
  */
 public abstract class ARequestQueue {
 
-    public static org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ARequestQueue.class);
+    public static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ARequestQueue.class);
 
     /**
      * global request version for tracking request changes.
      */
-    public final static String REQUEST_VERSION = "1.0.0";
-
-    // RequestIDTable mTable = new RequestIDTable();
+    public static final String REQUEST_VERSION = "1.0.0";
 
     IService mService;
     INotify mNotify;
@@ -100,7 +98,7 @@ public abstract class ARequestQueue {
      * @return
      *         an Enumeration that generates RequestId objects.
      */
-    abstract protected Enumeration<RequestId> getRawList();
+    protected abstract Enumeration<RequestId> getRawList();
 
     /**
      * protected access for setting the modification time of a request.
@@ -363,7 +361,7 @@ public abstract class ARequestQueue {
      * @param request request
      */
     public final void releaseRequest(IRequest request) {
-        // mTable.unlock(request.getRequestId());
+        // do nothing
     }
 
     /**
@@ -401,49 +399,17 @@ public abstract class ARequestQueue {
 
                 // Completed requests call the notifier and are done. Others
                 // wait for the serviceComplete call.
-                if (svcComplete) {
-                    r.setRequestStatus(RequestStatus.COMPLETE);
-                } else {
-                    r.setRequestStatus(RequestStatus.SVC_PENDING);
-                }
-
+                RequestStatus statusToSet = svcComplete ? RequestStatus.COMPLETE : RequestStatus.SVC_PENDING;
+                r.setRequestStatus(statusToSet);
                 updateRequest(r);
             } else if (rs == RequestStatus.SVC_PENDING) {
                 complete = true;
-            } else if (rs == RequestStatus.CANCELED) {
+            } else if (rs == RequestStatus.CANCELED || rs == RequestStatus.REJECTED || rs == RequestStatus.COMPLETE) {
                 if (mNotify != null)
                     mNotify.notify(r);
-
-                complete = true;
-            } else if (rs == RequestStatus.REJECTED) {
-                if (mNotify != null)
-                    mNotify.notify(r);
-
-                complete = true;
-            } else if (rs == RequestStatus.COMPLETE) {
-                if (mNotify != null)
-                    mNotify.notify(r);
-
                 complete = true;
             }
         }
-    }
-
-    /**
-     * log a change in the request status
-     */
-    protected void logChange(IRequest request) {
-        // write the queue name and request id
-        // write who changed it
-        // write what change (which state change) was made
-        //   - new (processRequest)
-        //   - approve
-        //   - reject
-
-        // Ordering
-        //  - make change in memory
-        //  - log change and result
-        //  - update record
     }
 
     /**
@@ -452,9 +418,7 @@ public abstract class ARequestQueue {
     protected String getUserIdentity() {
         // Record agent who did this
         SessionContext s = SessionContext.getContext();
-        String name = (String) s.get(SessionContext.USER_ID);
-
-        return name;
+        return (String) s.get(SessionContext.USER_ID);
     }
 
     /**
