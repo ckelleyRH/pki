@@ -43,7 +43,7 @@ jobs:
           dnf builddep -y --allowerasing --spec ./pki.spec --nogpgcheck
 
       - name: Build PKI packages
-        run: ./build.sh --with-pkgs=base,server --with-timestamp --with-commit-id --work-dir=build rpm
+        run: ./build.sh --with-pkgs=base,server,tests --with-timestamp --with-commit-id --work-dir=build rpm
 
       - name: Upload PKI packages
         uses: actions/upload-artifact@v2
@@ -78,8 +78,8 @@ jobs:
         run: bash base/util/src/test/shell/test_PKICertImport.bash
 
   # https://github.com/dogtagpki/pki/wiki/PKI-NSS-CLI
-  pki-nss-rsa-test:
-    name: Testing PKI NSS CLI with RSA
+  pki-nss-test:
+    name: Testing PKI NSS CLI
     needs: [init, build]
     runs-on: ubuntu-latest
     container: registry.fedoraproject.org/fedora:${{ matrix.os }}
@@ -98,278 +98,89 @@ jobs:
           dnf copr enable -y ${{ needs.init.outputs.repo }}
           dnf -y localinstall build/RPMS/*
 
+      # RSA tests
       # https://github.com/dogtagpki/pki/wiki/Generating-CA-Signing-CSR-with-PKI-NSS
       - name: Create CA signing cert request with new RSA key
-        run: |
-          pki nss-cert-request \
-              --key-type RSA \
-              --subject "CN=Certificate Authority" \
-              --ext /usr/share/pki/server/certs/ca_signing.conf \
-              --csr ca_signing.csr
-          openssl req -text -noout -in ca_signing.csr
+        run: bash /usr/share/pki/tests/tools/bin/create-cert-request.sh \
+                 'ca_signing' 'ca_signing' '--key-type RSA'
 
       # https://github.com/dogtagpki/pki/wiki/Issuing-CA-Signing-Certificate-with-PKI-NSS
       - name: Issue self-signed CA signing cert
-        run: |
-          pki nss-cert-issue \
-              --csr ca_signing.csr \
-              --ext /usr/share/pki/server/certs/ca_signing.conf \
-              --cert ca_signing.crt
-          openssl x509 -text -noout -in ca_signing.crt
+        run: bash /usr/share/pki/tests/tools/bin/issue-cert.sh 'ca_signing' 'ca_signing'
 
       - name: Import CA signing cert
-        run: |
-          pki nss-cert-import \
-              --cert ca_signing.crt \
-              --trust CT,C,C \
-              ca_signing
-
-          # verify trust flags
-          certutil -L -d /root/.dogtag/nssdb
-          certutil -L -d /root/.dogtag/nssdb | sed -n 's/^ca_signing\s*\(\S\+\)\s*$/\1/p' > actual
-          echo "CTu,Cu,Cu" > expected
-          diff actual expected
-
-          # verify key type
-          certutil -K -d /root/.dogtag/nssdb
-          certutil -K -d /root/.dogtag/nssdb | sed -n 's/^<.*>\s\+\(\S\+\)\s\+\S\+\s\+NSS Certificate DB:ca_signing$/\1/p' > actual
-          echo rsa > expected
-          diff actual expected
+        run: bash /usr/share/pki/tests/tools/bin/import-CA-signing-cert.sh 'rsa'
 
       # https://github.com/dogtagpki/pki/wiki/Generating-SSL-Server-CSR-with-PKI-NSS
       - name: Create SSL server cert request with new RSA key
-        run: |
-          pki nss-cert-request \
-              --key-type RSA \
-              --subject "CN=pki.example.com" \
-              --ext /usr/share/pki/server/certs/sslserver.conf \
-              --csr sslserver.csr
-          openssl req -text -noout -in sslserver.csr
+        run: bash /usr/share/pki/tests/tools/bin/create-cert-request.sh \
+                 'sslserver' 'sslserver' '--key-type RSA'
 
       # https://github.com/dogtagpki/pki/wiki/Issuing-SSL-Server-Certificate-with-PKI-NSS
       - name: Issue SSL server cert
-        run: |
-          pki nss-cert-issue \
-              --issuer ca_signing \
-              --csr sslserver.csr \
-              --ext /usr/share/pki/server/certs/sslserver.conf \
-              --cert sslserver.crt
-          openssl x509 -text -noout -in sslserver.crt
+        run: bash /usr/share/pki/tests/tools/bin/issue-cert.sh 'sslserver' 'sslserver' '--issuer ca_signing'
 
       - name: Import SSL server cert
-        run: |
-          pki nss-cert-import \
-              --cert sslserver.crt \
-              sslserver
-
-          # verify trust flags
-          certutil -L -d /root/.dogtag/nssdb
-          certutil -L -d /root/.dogtag/nssdb | sed -n 's/^sslserver\s*\(\S\+\)\s*$/\1/p' > actual
-          echo "u,u,u" > expected
-          diff actual expected
-
-          # verify key type
-          certutil -K -d /root/.dogtag/nssdb
-          certutil -K -d /root/.dogtag/nssdb | sed -n 's/^<.*>\s\+\(\S\+\)\s\+\S\+\s\+NSS Certificate DB:sslserver$/\1/p' > actual
-          echo rsa > expected
-          diff actual expected
-
-          # get key ID
-          certutil -K -d /root/.dogtag/nssdb | sed -n 's/^<.*>\s\+\S\+\s\+\(\S\+\)\s\+NSS Certificate DB:sslserver$/\1/p' > sslserver_key_id
+        run: bash /usr/share/pki/tests/tools/bin/import-SSL-server-cert.sh 'rsa'
 
       - name: Delete SSL server cert
-        run: |
-          certutil -D -d /root/.dogtag/nssdb -n sslserver
-          certutil -L -d /root/.dogtag/nssdb
-          certutil -K -d /root/.dogtag/nssdb
+        run: bash /usr/share/pki/tests/tools/bin/delete-cert.sh 'sslserver'
 
       - name: Create new SSL server cert request with existing RSA key
-        run: |
-          pki nss-cert-request \
-              --key-id `cat sslserver_key_id` \
-              --subject "CN=pki.example.com" \
-              --ext /usr/share/pki/server/certs/sslserver.conf \
-              --csr new_sslserver.csr
-          openssl req -text -noout -in new_sslserver.csr
+        run: bash /usr/share/pki/tests/tools/bin/create-cert-request.sh \
+                 'new_sslserver' 'sslserver' '--key-id sslserver_key_id'
 
       - name: Issue new SSL server cert
-        run: |
-          pki nss-cert-issue \
-              --issuer ca_signing \
-              --csr new_sslserver.csr \
-              --ext /usr/share/pki/server/certs/sslserver.conf \
-              --cert new_sslserver.crt
-          openssl x509 -text -noout -in new_sslserver.crt
+        run: bash /usr/share/pki/tests/tools/bin/issue-cert.sh 'new_sslserver' 'sslserver' '--issuer ca_signing'
 
       - name: Import new SSL server cert
-        run: |
-          pki nss-cert-import \
-              --cert new_sslserver.crt \
-              new_sslserver
+        run: bash /usr/share/pki/tests/tools/bin/import-new-SSL-server-cert.sh 'rsa'
 
-          # verify trust flags
-          certutil -L -d /root/.dogtag/nssdb
-          certutil -L -d /root/.dogtag/nssdb | sed -n 's/^new_sslserver\s*\(\S\+\)\s*$/\1/p' > actual
-          echo "u,u,u" > expected
-          diff actual expected
+      - name: Delete new SSL server cert
+        run: bash /usr/share/pki/tests/tools/bin/delete-cert.sh 'new_sslserver'
 
-          # verify key type
-          certutil -K -d /root/.dogtag/nssdb
-          certutil -K -d /root/.dogtag/nssdb | sed -n 's/^<.*>\s\+\(\S\+\)\s\+\S\+\s\+NSS Certificate DB:new_sslserver$/\1/p' > actual
-          echo rsa > expected
-          diff actual expected
+      - name: Delete RSA-generated CA signing cert
+        run: bash /usr/share/pki/tests/tools/bin/delete-cert.sh 'ca_signing'
 
-          # verify key ID
-          certutil -K -d /root/.dogtag/nssdb | sed -n 's/^<.*>\s\+\S\+\s\+\(\S\+\)\s\+NSS Certificate DB:new_sslserver$/\1/p' > new_sslserver_key_id
-          diff sslserver_key_id new_sslserver_key_id
-
-  # https://github.com/dogtagpki/pki/wiki/PKI-NSS-CLI
-  pki-nss-ecc-test:
-    name: Testing PKI NSS CLI with ECC
-    needs: [init, build]
-    runs-on: ubuntu-latest
-    container: registry.fedoraproject.org/fedora:${{ matrix.os }}
-    strategy:
-      matrix: ${{ fromJSON(needs.init.outputs.matrix) }}
-    steps:
-      - name: Download PKI packages
-        uses: actions/download-artifact@v2
-        with:
-          name: pki-build-${{ matrix.os }}
-          path: build/RPMS
-
-      - name: Install PKI packages
-        run: |
-          dnf install -y dnf-plugins-core
-          dnf copr enable -y ${{ needs.init.outputs.repo }}
-          dnf -y localinstall build/RPMS/*
-
-      # https://github.com/dogtagpki/pki/wiki/Generating-CA-Signing-CSR-with-PKI-NSS
+      # ECC tests
       - name: Create CA signing cert request with new EC key
-        run: |
-          pki nss-cert-request \
-              --key-type EC \
-              --curve nistp256 \
-              --subject "CN=Certificate Authority" \
-              --ext /usr/share/pki/server/certs/ca_signing.conf \
-              --csr ca_signing.csr
-          openssl req -text -noout -in ca_signing.csr
+        run: bash /usr/share/pki/tests/tools/bin/create-cert-request.sh \
+                 'ca_signing' 'ca_signing' '--key-type EC' '--curve nistp256'
 
-      # https://github.com/dogtagpki/pki/wiki/Issuing-CA-Signing-Certificate-with-PKI-NSS
       - name: Issue self-signed CA signing cert
-        run: |
-          pki nss-cert-issue \
-              --csr ca_signing.csr \
-              --ext /usr/share/pki/server/certs/ca_signing.conf \
-              --cert ca_signing.crt
-          openssl x509 -text -noout -in ca_signing.crt
+        run: bash /usr/share/pki/tests/tools/bin/issue-cert.sh 'ca_signing' 'ca_signing'
 
       - name: Import CA signing cert
-        run: |
-          pki nss-cert-import \
-              --cert ca_signing.crt \
-              --trust CT,C,C \
-              ca_signing
+        run: bash /usr/share/pki/tests/tools/bin/import-CA-signing-cert.sh 'ec'
 
-          # verify trust flags
-          certutil -L -d /root/.dogtag/nssdb
-          certutil -L -d /root/.dogtag/nssdb | sed -n 's/^ca_signing\s*\(\S\+\)\s*$/\1/p' > actual
-          echo "CTu,Cu,Cu" > expected
-          diff actual expected
-
-          # verify key type
-          certutil -K -d /root/.dogtag/nssdb
-          certutil -K -d /root/.dogtag/nssdb | sed -n 's/^<.*>\s\+\(\S\+\)\s\+\S\+\s\+NSS Certificate DB:ca_signing$/\1/p' > actual
-          echo ec > expected
-          diff actual expected
-
-      # https://github.com/dogtagpki/pki/wiki/Generating-SSL-Server-CSR-with-PKI-NSS
       - name: Create SSL server cert request with new EC key
-        run: |
-          pki nss-cert-request \
-              --key-type EC \
-              --curve nistp256 \
-              --subject "CN=pki.example.com" \
-              --ext /usr/share/pki/server/certs/sslserver.conf \
-              --csr sslserver.csr
-          openssl req -text -noout -in sslserver.csr
+        run: bash /usr/share/pki/tests/tools/bin/create-cert-request.sh \
+                 'sslserver' 'sslserver' '--key-type EC'
 
-      # https://github.com/dogtagpki/pki/wiki/Issuing-SSL-Server-Certificate-with-PKI-NSS
       - name: Issue SSL server cert
-        run: |
-          pki nss-cert-issue \
-              --issuer ca_signing \
-              --csr sslserver.csr \
-              --ext /usr/share/pki/server/certs/sslserver.conf \
-              --cert sslserver.crt
-          openssl x509 -text -noout -in sslserver.crt
+        run: bash /usr/share/pki/tests/tools/bin/issue-cert.sh 'sslserver' 'sslserver' '--issuer ca_signing'
 
       - name: Import SSL server cert
-        run: |
-          pki nss-cert-import \
-              --cert sslserver.crt \
-              sslserver
-
-          # verify trust flags
-          certutil -L -d /root/.dogtag/nssdb
-          certutil -L -d /root/.dogtag/nssdb | sed -n 's/^sslserver\s*\(\S\+\)\s*$/\1/p' > actual
-          echo "u,u,u" > expected
-          diff actual expected
-
-          # verify key type
-          certutil -K -d /root/.dogtag/nssdb
-          certutil -K -d /root/.dogtag/nssdb | sed -n 's/^<.*>\s\+\(\S\+\)\s\+\S\+\s\+NSS Certificate DB:sslserver$/\1/p' > actual
-          echo ec > expected
-          diff actual expected
-
-          # get key ID
-          certutil -K -d /root/.dogtag/nssdb | sed -n 's/^<.*>\s\+\S\+\s\+\(\S\+\)\s\+NSS Certificate DB:sslserver$/\1/p' > sslserver_key_id
+        run: bash /usr/share/pki/tests/tools/bin/import-SSL-server-cert.sh 'ec'
 
       - name: Delete SSL server cert
-        run: |
-          certutil -D -d /root/.dogtag/nssdb -n sslserver
-          certutil -L -d /root/.dogtag/nssdb
-          certutil -K -d /root/.dogtag/nssdb
+        run: bash /usr/share/pki/tests/tools/bin/delete-cert.sh 'sslserver'
 
       - name: Create new SSL server cert request with existing EC key
-        run: |
-          pki nss-cert-request \
-              --key-id `cat sslserver_key_id` \
-              --subject "CN=pki.example.com" \
-              --ext /usr/share/pki/server/certs/sslserver.conf \
-              --csr new_sslserver.csr
-          openssl req -text -noout -in new_sslserver.csr
+        run: bash /usr/share/pki/tests/tools/bin/create-cert-request.sh \
+                 'new_sslserver' 'sslserver' '--key-id sslserver_key_id'
 
       - name: Issue new SSL server cert
-        run: |
-          pki nss-cert-issue \
-              --issuer ca_signing \
-              --csr new_sslserver.csr \
-              --ext /usr/share/pki/server/certs/sslserver.conf \
-              --cert new_sslserver.crt
-          openssl x509 -text -noout -in new_sslserver.crt
+        run: bash /usr/share/pki/tests/tools/bin/issue-cert.sh 'new_sslserver' 'sslserver' '--issuer ca_signing'
 
       - name: Import new SSL server cert
-        run: |
-          pki nss-cert-import \
-              --cert new_sslserver.crt \
-              new_sslserver
+        run: bash /usr/share/pki/tests/tools/bin/import-new-SSL-server-cert.sh 'ec'
 
-          # verify trust flags
-          certutil -L -d /root/.dogtag/nssdb
-          certutil -L -d /root/.dogtag/nssdb | sed -n 's/^new_sslserver\s*\(\S\+\)\s*$/\1/p' > actual
-          echo "u,u,u" > expected
-          diff actual expected
+      - name: Delete new SSL server cert
+        run: bash /usr/share/pki/tests/tools/bin/delete-cert.sh 'new_sslserver'
 
-          # verify key type
-          certutil -K -d /root/.dogtag/nssdb
-          certutil -K -d /root/.dogtag/nssdb | sed -n 's/^<.*>\s\+\(\S\+\)\s\+\S\+\s\+NSS Certificate DB:new_sslserver$/\1/p' > actual
-          echo ec > expected
-          diff actual expected
-
-          # verify key ID
-          certutil -K -d /root/.dogtag/nssdb | sed -n 's/^<.*>\s\+\S\+\s\+\(\S\+\)\s\+NSS Certificate DB:new_sslserver$/\1/p' > new_sslserver_key_id
-          diff sslserver_key_id new_sslserver_key_id
+      - name: Delete ECC-generated CA signing cert
+        run: bash /usr/share/pki/tests/tools/bin/delete-cert.sh 'ca_signing'
 
   # https://github.com/dogtagpki/pki/wiki/PKI-NSS-CLI
   pki-nss-hsm-test:
