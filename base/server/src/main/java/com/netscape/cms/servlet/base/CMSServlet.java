@@ -108,6 +108,7 @@ import com.netscape.cmscore.request.RequestRepository;
 import com.netscape.cmscore.security.JssSubsystem;
 import com.netscape.cmscore.usrgrp.Group;
 import com.netscape.cmscore.usrgrp.UGSubsystem;
+import com.netscape.cmsutil.crypto.CryptoUtil;
 import com.netscape.cmsutil.xml.XMLObject;
 
 /**
@@ -241,7 +242,6 @@ public abstract class CMSServlet extends HttpServlet {
 
     // system logger.
     protected LogSource mLogCategory = ILogger.S_OTHER;
-    private MessageDigest mSHADigest = null;
 
     protected String mGetClientCert = "false";
     protected String mAuthMgr = null;
@@ -368,13 +368,6 @@ public abstract class CMSServlet extends HttpServlet {
             getDontSaveHttpParams(sc);
             getSaveHttpHeaders(sc);
         } catch (Exception e) {
-            logger.error(CMS.getLogMessage("CMSGW_ERR_CONF_TEMP_PARAMS", e.toString()), e);
-            throw new ServletException(e);
-        }
-
-        try {
-            mSHADigest = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException e) {
             logger.error(CMS.getLogMessage("CMSGW_ERR_CONF_TEMP_PARAMS", e.toString()), e);
             throw new ServletException(e);
         }
@@ -1525,12 +1518,27 @@ public abstract class CMSServlet extends HttpServlet {
         return salt;
     }
 
-    protected String hashPassword(String pwd) {
+    protected String hashPassword(String pwd, String challengeString) {
+        MessageDigest md = null;
+        String digestAlg = null;
+        try {
+            // Attempt to get algorithm from challengeString to ensure a match
+            digestAlg = challengeString.split("\\{")[1].split("\\}")[0].toUpperCase();
+            digestAlg = (digestAlg.equals("SHA1") || digestAlg.equals("SHA-1")) ? "SHA" : digestAlg;
+        } catch (IndexOutOfBoundsException e) {
+            // Fall back to the default hashing algorithm
+            digestAlg = CryptoUtil.getDefaultHashAlgName();
+        }
+        try {
+            md  = MessageDigest.getInstance(digestAlg);
+        } catch (NoSuchAlgorithmException e) {
+            logger.warn(CMS.getLogMessage("OPERATION_ERROR", e.toString()), e);
+        }
         String salt = generateSalt();
-        byte[] pwdDigest = mSHADigest.digest((salt + pwd).getBytes());
+        byte[] pwdDigest = md.digest((salt + pwd).getBytes());
         String b64E = Utils.base64encode(pwdDigest, true);
-
-        return "{SHA}" + salt + ";" + b64E;
+        logger.debug("Password hashed with {}", md.getAlgorithm());
+        return String.format("{%s}%s", md.getAlgorithm(), b64E);
     }
 
     /**

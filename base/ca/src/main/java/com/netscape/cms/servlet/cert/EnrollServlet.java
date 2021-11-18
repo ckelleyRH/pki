@@ -55,6 +55,7 @@ import com.netscape.certsrv.base.EBaseException;
 import com.netscape.certsrv.base.IArgBlock;
 import com.netscape.certsrv.base.IConfigStore;
 import com.netscape.certsrv.base.KeyGenInfo;
+import com.netscape.certsrv.base.MetaInfo;
 import com.netscape.certsrv.common.ICMSRequest;
 import com.netscape.certsrv.logging.AuditEvent;
 import com.netscape.certsrv.logging.AuditFormat;
@@ -327,10 +328,12 @@ public class EnrollServlet extends CMSServlet {
      * </UL>
      *
      * @param cmsReq the object holding the request and response information
+     * @throws IOException
+     * @throws CertificateException
      */
     @Override
     protected void process(CMSRequest cmsReq)
-            throws EBaseException {
+            throws EBaseException, CertificateException, IOException {
         // SPECIAL CASE:
         // if it is adminEnroll servlet,check if it's enabled
         if (mId.equals(ADMIN_ENROLL_SERVLET_ID) &&
@@ -688,9 +691,11 @@ public class EnrollServlet extends CMSServlet {
      *
      * @param cmsReq a certificate enrollment request
      * @exception EBaseException an error has occurred
+     * @throws IOException
+     * @throws CertificateException
      */
     protected void processX509(CMSRequest cmsReq)
-            throws EBaseException {
+            throws EBaseException, CertificateException, IOException {
 
         CAEngine engine = CAEngine.getInstance();
         EngineConfig configStore = engine.getConfig();
@@ -1280,7 +1285,10 @@ public class EnrollServlet extends CMSServlet {
             req.setExtData(IRequest.CERT_INFO, certInfoArray);
 
             if (challengePassword != null && !challengePassword.equals("")) {
-                String pwd = hashPassword(challengePassword);
+                MetaInfo metaInfo = (MetaInfo) certInfo.get(CertRecord.ATTR_META_INFO);
+                String challengeString =
+                        (String) metaInfo.get(CertRecord.META_CHALLENGE_PHRASE);
+                String pwd = hashPassword(challengePassword, challengeString);
 
                 req.setExtData(CHALLENGE_PASSWORD, pwd);
             }

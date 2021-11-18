@@ -102,6 +102,7 @@ import com.netscape.certsrv.authority.ICertAuthority;
 import com.netscape.certsrv.base.EBaseException;
 import com.netscape.certsrv.base.IConfigStore;
 import com.netscape.certsrv.base.ISubsystem;
+import com.netscape.certsrv.base.MetaInfo;
 import com.netscape.certsrv.base.SessionContext;
 import com.netscape.certsrv.ldap.ILdapConnFactory;
 import com.netscape.certsrv.logging.AuditEvent;
@@ -122,6 +123,7 @@ import com.netscape.cms.servlet.profile.SSLClientCertProvider;
 import com.netscape.cmscore.apps.CMS;
 import com.netscape.cmscore.authentication.AuthSubsystem;
 import com.netscape.cmscore.base.ArgBlock;
+import com.netscape.cmscore.dbs.CertRecord;
 import com.netscape.cmscore.ldap.CAPublisherProcessor;
 import com.netscape.cmscore.profile.ProfileSubsystem;
 import com.netscape.cmscore.request.CertRequestRepository;
@@ -188,8 +190,6 @@ public class CRSEnrollment extends HttpServlet {
     private String mAllowedDynamicProfileIdList = null;
     private String[] mAllowedDynamicProfileId;
     private boolean mUseOAEPKeyWrap = false;
-    /* for hashing challenge password */
-    protected MessageDigest mSHADigest = null;
 
     private static final String PROP_SUBSTORENAME = "substorename";
     private static final String PROP_AUTHORITY = "authority";
@@ -355,12 +355,6 @@ public class CRSEnrollment extends HttpServlet {
         OID_UNSTRUCTUREDNAME = X500NameAttrMap.getDefault().getOid("UNSTRUCTUREDNAME");
         OID_UNSTRUCTUREDADDRESS = X500NameAttrMap.getDefault().getOid("UNSTRUCTUREDADDRESS");
         OID_SERIALNUMBER = X500NameAttrMap.getDefault().getOid("SERIALNUMBER");
-
-        try {
-            mSHADigest = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException e) {
-        }
-
         mRandom = jssSubsystem.getRandomNumberGenerator();
 
     }
@@ -1370,9 +1364,13 @@ public class CRSEnrollment extends HttpServlet {
                 if (attr.getName().equals(ChallengePassword.NAME)) {
                     if (attr.get(ChallengePassword.PASSWORD) != null) {
                         req.put(AUTH_PASSWORD, attr.get(ChallengePassword.PASSWORD));
+                        MetaInfo metaInfo = (MetaInfo) certInfo.get(CertRecord.ATTR_META_INFO);
+                        String challengeString =
+                                (String) metaInfo.get(CertRecord.META_CHALLENGE_PHRASE);
                         req.put(ChallengePassword.NAME,
                                 hashPassword(
-                                    (String) attr.get(ChallengePassword.PASSWORD)));
+                                    (String) attr.get(ChallengePassword.PASSWORD),
+                                    challengeString));
                     }
                 }
 
@@ -1927,11 +1925,27 @@ public class CRSEnrollment extends HttpServlet {
         return issuedCert;
     }
 
-    protected String hashPassword(String pwd) {
+    private String hashPassword(String pwd, String challengeString) {
+        MessageDigest md = null;
+        String digestAlg = null;
+        try {
+            // Attempt to get algorithm from challengeString to ensure a match
+            digestAlg = challengeString.split("\\{")[1].split("\\}")[0].toUpperCase();
+            digestAlg = (digestAlg.equals("SHA1") || digestAlg.equals("SHA-1")) ? "SHA" : digestAlg;
+        } catch (IndexOutOfBoundsException e) {
+            // Fall back to the default hashing algorithm
+            digestAlg = CryptoUtil.getDefaultHashAlgName();
+        }
+        try {
+            md  = MessageDigest.getInstance(digestAlg);
+        } catch (NoSuchAlgorithmException e) {
+            logger.warn(CMS.getLogMessage("OPERATION_ERROR", e.toString()), e);
+        }
         String salt = "lala123";
-        byte[] pwdDigest = mSHADigest.digest((salt + pwd).getBytes());
+        byte[] pwdDigest = md.digest((salt + pwd).getBytes());
         String b64E = Utils.base64encode(pwdDigest, true);
-        return "{SHA}" + b64E;
+        logger.debug("Password hashed with {}", md.getAlgorithm());
+        return String.format("{%s}%s", md.getAlgorithm(), b64E);
     }
 
     /**
