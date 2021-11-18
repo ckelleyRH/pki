@@ -139,7 +139,7 @@ public class CAService implements ICAService, IService {
                 new serviceRevoke(this));
         mServants.put(
                 IRequest.REVOCATION_CHECK_CHALLENGE_REQUEST,
-                new serviceCheckChallenge(this));
+                new serviceCheckChallenge());
         mServants.put(
                 IRequest.GETCERTS_FOR_CHALLENGE_REQUEST,
                 new getCertsForChallenge(this));
@@ -1626,9 +1626,9 @@ class serviceCheckChallenge implements IServant {
 
     private MessageDigest mSHADigest = null;
 
-    public serviceCheckChallenge(CAService service) {
+    public serviceCheckChallenge() {
         try {
-            mSHADigest = MessageDigest.getInstance("SHA1");
+            mSHADigest = MessageDigest.getInstance(CryptoUtil.getDefaultHashAlgName());
         } catch (NoSuchAlgorithmException e) {
             logger.warn(CMS.getLogMessage("OPERATION_ERROR", e.toString()), e);
         }
@@ -1729,8 +1729,10 @@ class serviceCheckChallenge implements IServant {
         String salt = "lala123";
         byte[] pwdDigest = mSHADigest.digest((salt + pwd).getBytes());
         String b64E = Utils.base64encode(pwdDigest, true);
-
-        return "{SHA}" + b64E;
+        logger.debug("Password hashed with {}", mSHADigest.getAlgorithm());
+        String digestAlg = mSHADigest.getAlgorithm().toUpperCase();
+        String hashAlg = (digestAlg.equals("SHA1") || digestAlg.equals("SHA-1")) ? "SHA" : digestAlg;
+        return String.format("{%s}%s", hashAlg, b64E);
     }
 }
 

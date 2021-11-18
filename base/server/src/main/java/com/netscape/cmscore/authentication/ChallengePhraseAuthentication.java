@@ -44,6 +44,7 @@ import com.netscape.cmscore.dbs.CertRecord;
 import com.netscape.cmscore.dbs.CertificateRepository;
 import com.netscape.cmscore.request.RequestQueue;
 import com.netscape.cmscore.request.RequestRepository;
+import com.netscape.cmsutil.crypto.CryptoUtil;
 
 /**
  * Challenge phrase based authentication.
@@ -113,8 +114,7 @@ public class ChallengePhraseAuthentication implements AuthManager {
         mConfig = config;
 
         try {
-            mSHADigest = MessageDigest.getInstance("SHA1");
-
+            mSHADigest = MessageDigest.getInstance(CryptoUtil.getDefaultHashAlgName());
         } catch (NoSuchAlgorithmException e) {
             throw new EAuthException(CMS.getUserMessage("CMS_AUTHENTICATION_INTERNAL_ERROR", e.getMessage()), e);
         }
@@ -179,22 +179,16 @@ public class ChallengePhraseAuthentication implements AuthManager {
 
         if (serialNumString == null || serialNumString.equals(""))
             throw new EMissingCredential(CMS.getUserMessage("CMS_AUTHENTICATION_NULL_CREDENTIAL", CRED_CERT_SERIAL));
-        else {
-            //serialNumString = getDecimalStr(serialNumString);
-            try {
-                serialNumString = serialNumString.trim();
-                if (serialNumString.startsWith("0x") || serialNumString.startsWith("0X")) {
-                    serialNum = new
-                            BigInteger(serialNumString.substring(2), 16);
-                } else {
-                    serialNum = new
-                            BigInteger(serialNumString);
-                }
+        try {
+            serialNumString = serialNumString.trim();
+            boolean hasHexPrefix = serialNumString.toLowerCase().startsWith("0x");
+            serialNum = hasHexPrefix
+                    ? new BigInteger(serialNumString.substring(2), 16)
+                    : new BigInteger(serialNumString);
 
-            } catch (NumberFormatException e) {
-                throw new EAuthUserError(CMS.getUserMessage("CMS_AUTHENTICATION_INVALID_ATTRIBUTE_VALUE",
-                        "Invalid serial number"));
-            }
+        } catch (NumberFormatException e) {
+            throw new EAuthUserError(CMS.getUserMessage("CMS_AUTHENTICATION_INVALID_ATTRIBUTE_VALUE",
+                    "Invalid serial number"));
         }
 
         String challenge = (String) authCred.get(CRED_CHALLENGE);
@@ -315,14 +309,11 @@ public class ChallengePhraseAuthentication implements AuthManager {
         }
 
         if (!challengeString.equals(hashpwd)) {
+            logger.error("ChallengePhraseAuthentication: Incorrect challenge phrase password used for revocation");
             return false;
-
-            /*
-             logger.error("ChallengePhraseAuthentication: Incorrect challenge phrase password used for revocation");
-             throw new EInvalidCredentials();
-             */
-        } else
-            return true;
+        }
+        logger.debug("ChallengePhraseAuthentication: Correct challenge phrase password used for revocation");
+        return true;
     }
 
     /**
@@ -364,7 +355,7 @@ public class ChallengePhraseAuthentication implements AuthManager {
     }
 
     /**
-     * gets the configuretion substore used by this authentication
+     * gets the configuration substore used by this authentication
      * manager
      *
      * @return configuration store
@@ -378,7 +369,9 @@ public class ChallengePhraseAuthentication implements AuthManager {
         String salt = "lala123";
         byte[] pwdDigest = mSHADigest.digest((salt + pwd).getBytes());
         String b64E = Utils.base64encode(pwdDigest, true);
-
-        return "{SHA}" + b64E;
+        logger.debug("Password hashed with {}", mSHADigest.getAlgorithm());
+        String digestAlg = mSHADigest.getAlgorithm().toUpperCase();
+        String hashAlg = (digestAlg.equals("SHA1") || digestAlg.equals("SHA-1")) ? "SHA" : digestAlg;
+        return String.format("{%s}%s", hashAlg, b64E);
     }
 }

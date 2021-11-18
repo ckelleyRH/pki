@@ -1526,11 +1526,13 @@ public abstract class CMSServlet extends HttpServlet {
     }
 
     protected String hashPassword(String pwd) {
-        String salt = generateSalt();
+        String salt = "lala123";
         byte[] pwdDigest = mSHADigest.digest((salt + pwd).getBytes());
         String b64E = Utils.base64encode(pwdDigest, true);
-
-        return "{SHA}" + salt + ";" + b64E;
+        logger.debug("Password hashed with {}", mSHADigest.getAlgorithm());
+        String digestAlg = mSHADigest.getAlgorithm().toUpperCase();
+        String hashAlg = (digestAlg.equals("SHA1") || digestAlg.equals("SHA-1")) ? "SHA" : digestAlg;
+        return String.format("{%s}%s", hashAlg, b64E);
     }
 
     /**
