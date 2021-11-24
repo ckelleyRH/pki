@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import com.netscape.certsrv.dbs.certdb.CertId;
 import com.netscape.cmscore.apps.CMS;
-import com.netscape.cmscore.ldapconn.LDAPAuthenticationConfig;
 import com.netscape.cmscore.ldapconn.LDAPConfig;
 import com.netscape.cmscore.ldapconn.LDAPConnectionConfig;
 import com.netscape.cmscore.ldapconn.LdapAuthInfo;
@@ -83,17 +82,9 @@ public class CACertRemoveCLI extends CommandCLI {
         IPasswordStore passwordStore = IPasswordStore.create(psc);
 
         LDAPConnectionConfig connConfig = ldapConfig.getConnectionConfig();
-        LDAPAuthenticationConfig authConfig = ldapConfig.getAuthenticationConfig();
 
         LdapConnInfo connInfo = new LdapConnInfo(connConfig);
-
-        LdapAuthInfo authInfo = new LdapAuthInfo();
-        authInfo.setPasswordStore(passwordStore);
-        authInfo.init(
-                authConfig,
-                connInfo.getHost(),
-                connInfo.getPort(),
-                connInfo.getSecure());
+        LdapAuthInfo authInfo = getAuthInfo(passwordStore, connInfo, ldapConfig);
 
         PKISocketConfig socketConfig = cs.getSocketConfig();
 

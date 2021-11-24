@@ -26,7 +26,6 @@ import com.netscape.cmscore.apps.SubsystemsConfig;
 import com.netscape.cmscore.base.ConfigStorage;
 import com.netscape.cmscore.base.LDAPConfigStore;
 import com.netscape.cmscore.base.PropConfigStore;
-import com.netscape.cmscore.ldapconn.LDAPAuthenticationConfig;
 import com.netscape.cmscore.ldapconn.LDAPConfig;
 import com.netscape.cmscore.ldapconn.LDAPConnectionConfig;
 import com.netscape.cmscore.ldapconn.LdapAuthInfo;
@@ -94,17 +93,9 @@ public class CAProfileImportCLI extends CommandCLI {
         String baseDN = ldapConfig.getBaseDN();
 
         LDAPConnectionConfig connConfig = ldapConfig.getConnectionConfig();
-        LDAPAuthenticationConfig authConfig = ldapConfig.getAuthenticationConfig();
 
         LdapConnInfo connInfo = new LdapConnInfo(connConfig);
-
-        LdapAuthInfo authInfo = new LdapAuthInfo();
-        authInfo.setPasswordStore(passwordStore);
-        authInfo.init(
-                authConfig,
-                connInfo.getHost(),
-                connInfo.getPort(),
-                connInfo.getSecure());
+        LdapAuthInfo authInfo = getAuthInfo(passwordStore, connInfo, ldapConfig);
 
         PKISocketConfig socketConfig = cs.getSocketConfig();
 

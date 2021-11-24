@@ -25,10 +25,16 @@ import org.apache.tomcat.util.net.jss.TomcatJSS;
 import org.dogtagpki.util.logging.PKILogger;
 import org.dogtagpki.util.logging.PKILogger.Level;
 
+import com.netscape.certsrv.base.EBaseException;
 import com.netscape.cmscore.apps.CMS;
 import com.netscape.cmscore.apps.EngineConfig;
 import com.netscape.cmscore.base.ConfigStorage;
 import com.netscape.cmscore.base.FileConfigStore;
+import com.netscape.cmscore.ldapconn.LDAPAuthenticationConfig;
+import com.netscape.cmscore.ldapconn.LDAPConfig;
+import com.netscape.cmscore.ldapconn.LdapAuthInfo;
+import com.netscape.cmscore.ldapconn.LdapConnInfo;
+import com.netscape.cmsutil.password.IPasswordStore;
 
 /**
  * @author Endi S. Dewata
@@ -84,6 +90,19 @@ public class CommandCLI extends CLI {
         EngineConfig engineConfig = new EngineConfig(storage);
         engineConfig.load();
         return engineConfig;
+    }
+
+    protected LdapAuthInfo getAuthInfo(IPasswordStore passwordStore, LdapConnInfo connInfo, LDAPConfig ldapConfig)
+            throws EBaseException {
+        LDAPAuthenticationConfig authConfig = ldapConfig.getAuthenticationConfig();
+        LdapAuthInfo authInfo = new LdapAuthInfo();
+        authInfo.setPasswordStore(passwordStore);
+        authInfo.init(
+                authConfig,
+                connInfo.getHost(),
+                connInfo.getPort(),
+                connInfo.getSecure());
+        return authInfo;
     }
 
 }
