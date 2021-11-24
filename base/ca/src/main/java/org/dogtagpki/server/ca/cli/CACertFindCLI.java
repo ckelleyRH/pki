@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
 import com.netscape.certsrv.dbs.certdb.CertId;
 import com.netscape.cmscore.apps.CMS;
 import com.netscape.cmscore.apps.DatabaseConfig;
-import com.netscape.cmscore.base.ConfigStorage;
-import com.netscape.cmscore.base.FileConfigStore;
 import com.netscape.cmscore.dbs.CertRecord;
 import com.netscape.cmscore.dbs.CertRecordList;
 import com.netscape.cmscore.dbs.CertificateRepository;
@@ -71,9 +69,7 @@ public class CACertFindCLI extends CommandCLI {
         String configFile = confDir + File.separator + CMS.CONFIG_FILE;
 
         logger.info("Loading " + configFile);
-        ConfigStorage storage = new FileConfigStore(configFile);
-        CAEngineConfig cs = new CAEngineConfig(storage);
-        cs.load();
+        CAEngineConfig cs = (CAEngineConfig) getEngineConfig(subsystem);
 
         DatabaseConfig dbConfig = cs.getDatabaseConfig();
         PKISocketConfig socketConfig = cs.getSocketConfig();

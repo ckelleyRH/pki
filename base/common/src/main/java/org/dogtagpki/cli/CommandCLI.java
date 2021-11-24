@@ -18,10 +18,17 @@
 
 package org.dogtagpki.cli;
 
+import java.io.File;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.tomcat.util.net.jss.TomcatJSS;
 import org.dogtagpki.util.logging.PKILogger;
 import org.dogtagpki.util.logging.PKILogger.Level;
+
+import com.netscape.cmscore.apps.CMS;
+import com.netscape.cmscore.apps.EngineConfig;
+import com.netscape.cmscore.base.ConfigStorage;
+import com.netscape.cmscore.base.FileConfigStore;
 
 /**
  * @author Endi S. Dewata
@@ -66,6 +73,17 @@ public class CommandCLI extends CLI {
         TomcatJSS tomcatjss = TomcatJSS.getInstance();
         tomcatjss.loadConfig();
         tomcatjss.init();
+    }
+
+    protected EngineConfig getEngineConfig(String subsystem) throws Exception {
+        String catalinaBase = System.getProperty("catalina.base");
+        String configDir = catalinaBase + File.separator + subsystem;
+        String configFile = configDir + File.separator + "conf" + File.separator + CMS.CONFIG_FILE;
+        logger.info("Loading {}", configFile);
+        ConfigStorage storage = new FileConfigStore(configFile);
+        EngineConfig engineConfig = new EngineConfig(storage);
+        engineConfig.load();
+        return engineConfig;
     }
 
 }

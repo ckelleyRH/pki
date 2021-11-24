@@ -12,11 +12,9 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.dogtagpki.cli.CLI;
 import org.dogtagpki.cli.CommandCLI;
+import org.dogtagpki.server.ca.CAEngineConfig;
 
 import com.netscape.cmscore.apps.CMS;
-import com.netscape.cmscore.apps.EngineConfig;
-import com.netscape.cmscore.base.ConfigStorage;
-import com.netscape.cmscore.base.FileConfigStore;
 import com.netscape.cmscore.ldapconn.LDAPAuthenticationConfig;
 import com.netscape.cmscore.ldapconn.LDAPConfig;
 import com.netscape.cmscore.ldapconn.LDAPConnectionConfig;
@@ -92,9 +90,7 @@ public class SDHostAddCLI extends CommandCLI {
         String configFile = subsystemConfDir + File.separator + CMS.CONFIG_FILE;
 
         logger.info("Loading " + configFile);
-        ConfigStorage storage = new FileConfigStore(configFile);
-        EngineConfig cs = new EngineConfig(storage);
-        cs.load();
+        CAEngineConfig cs = (CAEngineConfig) getEngineConfig(subsystem);
         LDAPConfig ldapConfig = cs.getInternalDBConfig();
 
         PasswordStoreConfig psc = cs.getPasswordStoreConfig();

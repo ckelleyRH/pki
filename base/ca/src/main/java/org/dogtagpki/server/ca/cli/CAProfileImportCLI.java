@@ -12,6 +12,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.cli.CommandLine;
 import org.dogtagpki.cli.CLI;
 import org.dogtagpki.cli.CommandCLI;
+import org.dogtagpki.server.ca.CAEngineConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,6 @@ import com.netscape.cmscore.apps.EngineConfig;
 import com.netscape.cmscore.apps.SubsystemConfig;
 import com.netscape.cmscore.apps.SubsystemsConfig;
 import com.netscape.cmscore.base.ConfigStorage;
-import com.netscape.cmscore.base.FileConfigStore;
 import com.netscape.cmscore.base.LDAPConfigStore;
 import com.netscape.cmscore.base.PropConfigStore;
 import com.netscape.cmscore.ldapconn.LDAPAuthenticationConfig;
@@ -72,16 +72,14 @@ public class CAProfileImportCLI extends CommandCLI {
 
         initializeTomcatJSS();
 
-        String subsystemName = parent.getParent().getName();
-        String configFile = catalinaBase + File.separator + subsystemName + File.separator +
+        String subsystem = parent.getParent().getName();
+        String configFile = catalinaBase + File.separator + subsystem + File.separator +
                 "conf" + File.separator + CMS.CONFIG_FILE;
 
         logger.info("Loading " + configFile);
-        ConfigStorage storage = new FileConfigStore(configFile);
-        EngineConfig cs = new EngineConfig(storage);
-        cs.load();
+        CAEngineConfig cs = (CAEngineConfig) getEngineConfig(subsystem);
 
-        String pluginRegistryFile = catalinaBase + "/conf/" + subsystemName + "/registry.cfg";
+        String pluginRegistryFile = catalinaBase + "/conf/" + subsystem + "/registry.cfg";
         logger.info("Loading " + pluginRegistryFile);
 
         IConfigStore pluginRegistryConfig = cs.getSubStore(PluginRegistry.ID);
