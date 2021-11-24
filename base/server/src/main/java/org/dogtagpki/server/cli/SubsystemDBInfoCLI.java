@@ -23,6 +23,7 @@ import java.util.Enumeration;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.dogtagpki.cli.CLI;
+import org.dogtagpki.cli.CommandCLI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ import netscape.ldap.LDAPv3;
 /**
  * @author Endi S. Dewata
  */
-public class SubsystemDBInfoCLI extends SubsystemCLI {
+public class SubsystemDBInfoCLI extends CommandCLI {
 
     public static Logger logger = LoggerFactory.getLogger(SubsystemDBInfoCLI.class);
 

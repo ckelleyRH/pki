@@ -10,6 +10,7 @@ import java.util.Enumeration;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.lang3.StringUtils;
 import org.dogtagpki.cli.CLI;
+import org.dogtagpki.cli.CommandCLI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ import com.netscape.cmsutil.password.PasswordStoreConfig;
 /**
  * @author Endi S. Dewata
  */
-public class SubsystemGroupFindCLI extends SubsystemCLI {
+public class SubsystemGroupFindCLI extends CommandCLI {
 
     public static Logger logger = LoggerFactory.getLogger(SubsystemGroupFindCLI.class);
 

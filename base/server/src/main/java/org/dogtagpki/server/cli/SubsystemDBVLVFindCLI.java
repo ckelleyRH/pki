@@ -10,6 +10,7 @@ import java.util.Enumeration;
 
 import org.apache.commons.cli.CommandLine;
 import org.dogtagpki.cli.CLI;
+import org.dogtagpki.cli.CommandCLI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ import netscape.ldap.LDAPEntry;
 /**
  * @author Endi S. Dewata
  */
-public class SubsystemDBVLVFindCLI extends SubsystemCLI {
+public class SubsystemDBVLVFindCLI extends CommandCLI {
 
     public static Logger logger = LoggerFactory.getLogger(SubsystemDBVLVFindCLI.class);
 

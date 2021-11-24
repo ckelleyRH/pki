@@ -7,6 +7,7 @@ package org.dogtagpki.server.cli;
 
 import org.apache.commons.cli.CommandLine;
 import org.dogtagpki.cli.CLI;
+import org.dogtagpki.cli.CommandCLI;
 import org.dogtagpki.util.logging.PKILogger;
 import org.dogtagpki.util.logging.PKILogger.Level;
 import org.slf4j.Logger;
@@ -24,6 +25,8 @@ import com.netscape.cmscore.ldapconn.LDAPConfig;
 import com.netscape.cmscore.ldapconn.LDAPConnectionConfig;
 import com.netscape.cmscore.ldapconn.LdapBoundConnFactory;
 import com.netscape.cmscore.ldapconn.PKISocketConfig;
+import com.netsc
+import com.netscape.cmstools.cli.SubsystemCLI;ape.cmscore.ldapconn.PKISocketConfig;
 import com.netscape.cmsutil.password.IPasswordStore;
 import com.netscape.cmsutil.password.PasswordStoreConfig;
 
@@ -32,7 +35,7 @@ import netscape.ldap.LDAPConnection;
 /**
  * @author Endi S. Dewata
  */
-public class SubsystemDBReplicationSetupCLI extends SubsystemCLI {
+public class SubsystemDBReplicationSetupCLI extends CommandCLI {
 
     public static Logger logger = LoggerFactory.getLogger(SubsystemDBReplicationSetupCLI.class);
 

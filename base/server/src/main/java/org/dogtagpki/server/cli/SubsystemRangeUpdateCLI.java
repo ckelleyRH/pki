@@ -10,6 +10,7 @@ import java.math.BigInteger;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.dogtagpki.cli.CLI;
+import org.dogtagpki.cli.CommandCLI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ import netscape.ldap.LDAPModification;
 /**
  * @author Endi S. Dewata
  */
-public class SubsystemRangeUpdateCLI extends SubsystemCLI {
+public class SubsystemRangeUpdateCLI extends CommandCLI {
 
     public static Logger logger = LoggerFactory.getLogger(SubsystemRangeUpdateCLI.class);
 

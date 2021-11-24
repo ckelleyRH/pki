@@ -20,6 +20,7 @@ package org.dogtagpki.server.cli;
 
 import org.apache.commons.cli.CommandLine;
 import org.dogtagpki.cli.CLI;
+import org.dogtagpki.cli.CommandCLI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,7 @@ import com.netscape.cmsutil.password.PasswordStoreConfig;
 /**
  * @author Endi S. Dewata
  */
-public class SubsystemDBUpgradeCLI extends SubsystemCLI {
+public class SubsystemDBUpgradeCLI extends CommandCLI {
 
     public static Logger logger = LoggerFactory.getLogger(SubsystemDBUpgradeCLI.class);
 

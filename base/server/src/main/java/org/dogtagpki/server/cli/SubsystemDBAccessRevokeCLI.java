@@ -7,6 +7,7 @@ package org.dogtagpki.server.cli;
 
 import org.apache.commons.cli.CommandLine;
 import org.dogtagpki.cli.CLI;
+import org.dogtagpki.cli.CommandCLI;
 import org.dogtagpki.util.logging.PKILogger;
 import org.dogtagpki.util.logging.PKILogger.Level;
 import org.slf4j.Logger;
@@ -27,7 +28,7 @@ import com.netscape.cmsutil.password.PasswordStoreConfig;
 /**
  * @author Endi S. Dewata
  */
-public class SubsystemDBAccessRevokeCLI extends SubsystemCLI {
+public class SubsystemDBAccessRevokeCLI extends CommandCLI {
 
     public static Logger logger = LoggerFactory.getLogger(SubsystemDBAccessRevokeCLI.class);
 

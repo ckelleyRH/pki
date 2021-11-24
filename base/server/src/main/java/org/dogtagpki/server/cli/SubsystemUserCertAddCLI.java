@@ -12,6 +12,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.io.IOUtils;
 import org.dogtagpki.cli.CLI;
+import org.dogtagpki.cli.CommandCLI;
 import org.mozilla.jss.netscape.security.util.Cert;
 import org.mozilla.jss.netscape.security.x509.X509CertImpl;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ import com.netscape.cmsutil.password.PasswordStoreConfig;
 /**
  * @author Endi S. Dewata
  */
-public class SubsystemUserCertAddCLI extends SubsystemCLI {
+public class SubsystemUserCertAddCLI extends CommandCLI {
 
     public static Logger logger = LoggerFactory.getLogger(SubsystemUserCertAddCLI.class);
 
