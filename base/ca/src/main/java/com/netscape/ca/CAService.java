@@ -1717,11 +1717,12 @@ class serviceCheckChallenge implements IServant {
         }
 
         String hashpwd = hashPassword(pwd);
+        logger.error("pwd = %s, hashpwd = %s", pwd, hashpwd);
 
         // got metaInfo
         String challengeString =
                 (String) metaInfo.get(CertRecord.META_CHALLENGE_PHRASE);
-
+        logger.error(String.valueOf(challengeString.equals(hashpwd)));
         return challengeString.equals(hashpwd);
     }
 
