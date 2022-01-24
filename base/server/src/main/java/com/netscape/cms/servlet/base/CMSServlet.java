@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -108,7 +106,6 @@ import com.netscape.cmscore.request.RequestRepository;
 import com.netscape.cmscore.security.JssSubsystem;
 import com.netscape.cmscore.usrgrp.Group;
 import com.netscape.cmscore.usrgrp.UGSubsystem;
-import com.netscape.cmsutil.crypto.CryptoUtil;
 import com.netscape.cmsutil.xml.XMLObject;
 
 /**
@@ -1519,26 +1516,7 @@ public abstract class CMSServlet extends HttpServlet {
     }
 
     protected String hashPassword(String pwd, String challengeString) {
-        MessageDigest md = null;
-        String digestAlg = null;
-        try {
-            // Attempt to get algorithm from challengeString to ensure a match
-            digestAlg = challengeString.split("\\{")[1].split("\\}")[0].toUpperCase();
-            digestAlg = (digestAlg.equals("SHA1") || digestAlg.equals("SHA-1")) ? "SHA" : digestAlg;
-        } catch (IndexOutOfBoundsException e) {
-            // Fall back to the default hashing algorithm
-            digestAlg = CryptoUtil.getDefaultHashAlgName();
-        }
-        try {
-            md  = MessageDigest.getInstance(digestAlg);
-        } catch (NoSuchAlgorithmException e) {
-            logger.warn(CMS.getLogMessage("OPERATION_ERROR", e.toString()), e);
-        }
-        String salt = generateSalt();
-        byte[] pwdDigest = md.digest((salt + pwd).getBytes());
-        String b64E = Utils.base64encode(pwdDigest, true);
-        logger.debug("Password hashed with {}", md.getAlgorithm());
-        return String.format("{%s}%s", md.getAlgorithm(), b64E);
+        throw new RuntimeException("pwd = '" + pwd + "', challengeString = '" + challengeString + "'");
     }
 
     /**
