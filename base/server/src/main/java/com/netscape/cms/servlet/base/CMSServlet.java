@@ -1524,14 +1524,6 @@ public abstract class CMSServlet extends HttpServlet {
         return salt;
     }
 
-    protected String hashPassword(String pwd) {
-        String salt = generateSalt();
-        byte[] pwdDigest = mSHADigest.digest((salt + pwd).getBytes());
-        String b64E = Utils.base64encode(pwdDigest, true);
-
-        return "{SHA}" + salt + ";" + b64E;
-    }
-
     /**
      * @param req http servlet request
      * @param realpathFile the file to get.
