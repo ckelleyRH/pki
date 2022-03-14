@@ -1367,15 +1367,6 @@ public class CRSEnrollment extends HttpServlet {
                 PKCS10Attribute p10a = e.nextElement();
                 CertAttrSet attr = p10a.getAttributeValue();
 
-                if (attr.getName().equals(ChallengePassword.NAME)) {
-                    if (attr.get(ChallengePassword.PASSWORD) != null) {
-                        req.put(AUTH_PASSWORD, attr.get(ChallengePassword.PASSWORD));
-                        req.put(ChallengePassword.NAME,
-                                hashPassword(
-                                    (String) attr.get(ChallengePassword.PASSWORD)));
-                    }
-                }
-
                 if (attr.getName().equals(ExtensionsRequested.NAME)) {
 
                     Enumeration<Extension> exts = ((ExtensionsRequested) attr).getExtensions().elements();
@@ -1925,13 +1916,6 @@ public class CRSEnrollment extends HttpServlet {
         }
 
         return issuedCert;
-    }
-
-    protected String hashPassword(String pwd) {
-        String salt = "lala123";
-        byte[] pwdDigest = mSHADigest.digest((salt + pwd).getBytes());
-        String b64E = Utils.base64encode(pwdDigest, true);
-        return "{SHA}" + b64E;
     }
 
     /**
