@@ -245,6 +245,8 @@ jobs:
 
       - name: Check CA profiles
         run: |
+          docker stats -a
+          docker exec pki free -g
           docker exec pki pki -n caadmin ca-profile-find
 
           # create custom profile
