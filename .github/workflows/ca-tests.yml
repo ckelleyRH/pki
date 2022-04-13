@@ -204,6 +204,17 @@ jobs:
         run: |
           docker exec pki openssl x509 -text -noout -in /root/.dogtag/pki-tomcat/ca_admin.cert
 
+
+      - name: Check CA profiles
+        run: |
+          docker exec pki pki -n caadmin ca-profile-find
+
+          # create custom profile
+          docker exec pki pki -n caadmin ca-profile-show caUserCert --output ${SHARED}/profile.xml
+          sed -i "s/caUserCert/caCustomUser/g" profile.xml
+          docker exec pki pki --debug -n caadmin ca-profile-add ${SHARED}/profile.xml
+          docker exec pki pki -n caadmin ca-profile-show caCustomUser
+
       - name: Run PKI healthcheck
         run: docker exec pki pki-healthcheck --failures-only
 
@@ -242,16 +253,6 @@ jobs:
           docker exec pki /usr/share/pki/tests/ca/bin/test-ca-auditor-create.sh
           docker exec pki /usr/share/pki/tests/ca/bin/test-ca-auditor-cert.sh
           docker exec pki /usr/share/pki/tests/ca/bin/test-ca-auditor-logs.sh
-
-      - name: Check CA profiles
-        run: |
-          docker exec pki pki -n caadmin ca-profile-find
-
-          # create custom profile
-          docker exec pki pki -n caadmin ca-profile-show caUserCert --output ${SHARED}/profile.xml
-          sed -i "s/caUserCert/caCustomUser/g" profile.xml
-          docker exec pki pki --debug -n caadmin ca-profile-add ${SHARED}/profile.xml
-          docker exec pki pki -n caadmin ca-profile-show caCustomUser
 
       - name: Gather artifacts
         if: always()
