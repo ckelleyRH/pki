@@ -15,18 +15,16 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netscape.certsrv.util.JSONSerializer;
 
 public class JSONObject {
 
-    private ObjectMapper mapper = null;
+    private ObjectMapper mapper = JSONSerializer.getObjectMapper();
     private ObjectNode rootNode = null;
     private JsonNode jsonNode = null;
 
     public JSONObject() {
-        mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         rootNode = mapper.createObjectNode();
     }
 
