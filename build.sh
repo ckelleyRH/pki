@@ -23,7 +23,7 @@ DIST=
 WITHOUT_TEST=
 WITH_CONSOLE=
 
-PKG_LIST="base, server, acme, ca, kra, ocsp, tks, tps, javadoc, theme, meta, tests, debug"
+PKG_LIST="base, server, acme, ca, est, kra, ocsp, tks, tps, javadoc, theme, meta, tests, debug"
 ALL_PKGS=( $(echo $PKG_LIST | sed 's/ *, */ /g') )
 
 WITH_PKGS=

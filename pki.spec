@@ -77,6 +77,7 @@ ExcludeArch: i686
 %bcond_without server
 %bcond_without acme
 %bcond_without ca
+%bcond_without est
 %bcond_without kra
 %bcond_without ocsp
 %bcond_without tks
@@ -218,6 +219,7 @@ to manage enterprise Public Key Infrastructure deployments.
 
   * Automatic Certificate Management Environment (ACME) Responder
   * Certificate Authority (CA)
+  * Enrollment over Secure Transport (EST) Service
   * Key Recovery Authority (KRA)
   * Online Certificate Status Protocol (OCSP) Manager
   * Token Key Service (TKS)
@@ -248,6 +250,7 @@ Requires:         %{product_id}-theme = %{version}-%{release}
 # of ALL PKI core packages
 Requires:         %{product_id}-acme = %{version}-%{release}
 Requires:         %{product_id}-ca = %{version}-%{release}
+Requires:         %{product_id}-est = %{version}-%{release}
 Requires:         %{product_id}-kra = %{version}-%{release}
 Requires:         %{product_id}-ocsp = %{version}-%{release}
 Requires:         %{product_id}-tks = %{version}-%{release}
@@ -275,6 +278,7 @@ to manage enterprise Public Key Infrastructure deployments.
 
   * Automatic Certificate Management Environment (ACME) Responder
   * Certificate Authority (CA)
+  * Enrollment over Secure Transport (EST) Service
   * Key Recovery Authority (KRA)
   * Online Certificate Status Protocol (OCSP) Manager
   * Token Key Service (TKS)
@@ -507,6 +511,29 @@ Authority, where it is the root CA, or it can act as a subordinate CA,
 where it obtains its own signing certificate from a public CA.
 
 # with ca
+%endif
+
+%if %{with est}
+################################################################################
+%package -n       %{product_id}-est
+################################################################################
+
+Summary:          %{product_name} EST Package
+BuildArch:        noarch
+
+Obsoletes:        pki-est < %{version}-%{release}
+Provides:         pki-est = %{version}-%{release}
+
+Requires:         %{product_id}-server = %{version}-%{release}
+Requires(post):   systemd-units
+Requires(postun): systemd-units
+
+%description -n   %{product_id}-est
+%{product_name} The Enrollment over Secure Transport (EST) Service is used to
+provision certificates from a CA or RA consistent with RFC 7030. It is intended
+as a replacement for SCEP.
+
+# with est
 %endif
 
 %if %{with kra}
@@ -795,6 +822,7 @@ app_server=tomcat-9.0
     -DPYTHON_EXECUTABLE=%{python_executable} \
     -DWITH_SERVER:BOOL=%{?with_server:ON}%{!?with_server:OFF} \
     -DWITH_CA:BOOL=%{?with_ca:ON}%{!?with_ca:OFF} \
+    -DWITH_EST:BOOL=%{?with_est:ON}%{!?with_est:OFF} \
     -DWITH_KRA:BOOL=%{?with_kra:ON}%{!?with_kra:OFF} \
     -DWITH_OCSP:BOOL=%{?with_ocsp:ON}%{!?with_ocsp:OFF} \
     -DWITH_TKS:BOOL=%{?with_tks:ON}%{!?with_tks:OFF} \
@@ -1115,6 +1143,18 @@ fi
 %{_datadir}/pki/ca/
 
 # with ca
+%endif
+
+%if %{with est}
+################################################################################
+%files -n %{product_id}-est
+################################################################################
+
+%license base/est/LICENSE
+%{_javadir}/pki/pki-est.jar
+%{_datadir}/pki/est/
+
+# with est
 %endif
 
 %if %{with kra}

@@ -12,6 +12,8 @@
 	<classpathentry kind="src" path="base/server/src/test/java"/>
 	<classpathentry kind="src" path="base/ca/src/main/java"/>
 	<classpathentry kind="src" path="base/ca/src/test/java"/>
+	<classpathentry kind="src" path="base/est/src/main/java"/>
+	<classpathentry kind="src" path="base/est/src/test/java"/>
 	<classpathentry kind="src" path="base/kra/src/main/java"/>
 	<classpathentry kind="src" path="base/kra/src/test/java"/>
 	<classpathentry kind="src" path="base/ocsp/src/main/java"/>
