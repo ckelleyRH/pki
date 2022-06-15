@@ -321,6 +321,8 @@ fi
 
 RELEASE="$(rpmspec -P "$SPEC_TEMPLATE" --undefine dist | grep "^Release:" | awk '{print $2;}')"
 
+echo "Building $NAME-$VERSION-$RELEASE"
+
 if [ "$DEBUG" = true ] ; then
     echo "RELEASE: $RELEASE"
 fi
@@ -354,8 +356,6 @@ fi
 if [ "$DEBUG" = true ] ; then
     echo "COMMIT_ID: $COMMIT_ID"
 fi
-
-echo "Building $NAME-$VERSION-$RELEASE"
 
 rm -rf BUILD
 rm -rf BUILDROOT
