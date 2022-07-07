@@ -20,6 +20,9 @@ package com.netscape.certsrv.logging;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -115,17 +118,16 @@ public class ActivityData implements JSONSerializer {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((date == null) ? 0 : date.hashCode());
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((ip == null) ? 0 : ip.hashCode());
-        result = prime * result + ((message == null) ? 0 : message.hashCode());
-        result = prime * result + ((operation == null) ? 0 : operation.hashCode());
-        result = prime * result + ((this.result == null) ? 0 : this.result.hashCode());
-        result = prime * result + ((tokenID == null) ? 0 : tokenID.hashCode());
-        result = prime * result + ((userID == null) ? 0 : userID.hashCode());
-        return result;
+        return new HashCodeBuilder()
+                .append(date)
+                .append(id)
+                .append(ip)
+                .append(message)
+                .append(operation)
+                .append(result)
+                .append(tokenID)
+                .append(userID)
+                .toHashCode();
     }
 
     @Override
@@ -137,47 +139,16 @@ public class ActivityData implements JSONSerializer {
         if (getClass() != obj.getClass())
             return false;
         ActivityData other = (ActivityData) obj;
-        if (date == null) {
-            if (other.date != null)
-                return false;
-        } else if (!date.equals(other.date))
-            return false;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        if (ip == null) {
-            if (other.ip != null)
-                return false;
-        } else if (!ip.equals(other.ip))
-            return false;
-        if (message == null) {
-            if (other.message != null)
-                return false;
-        } else if (!message.equals(other.message))
-            return false;
-        if (operation == null) {
-            if (other.operation != null)
-                return false;
-        } else if (!operation.equals(other.operation))
-            return false;
-        if (result == null) {
-            if (other.result != null)
-                return false;
-        } else if (!result.equals(other.result))
-            return false;
-        if (tokenID == null) {
-            if (other.tokenID != null)
-                return false;
-        } else if (!tokenID.equals(other.tokenID))
-            return false;
-        if (userID == null) {
-            if (other.userID != null)
-                return false;
-        } else if (!userID.equals(other.userID))
-            return false;
-        return true;
+        return new EqualsBuilder()
+                .append(date, other.date)
+                .append(id, other.id)
+                .append(ip, other.ip)
+                .append(message, other.message)
+                .append(operation, other.operation)
+                .append(result, other.result)
+                .append(tokenID, other.tokenID)
+                .append(userID, other.userID)
+                .isEquals();
     }
 
 }
