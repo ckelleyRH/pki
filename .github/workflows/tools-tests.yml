@@ -1436,8 +1436,10 @@ jobs:
         with:
           name: pki-build-${{ matrix.os }}
           path: |
-            build/RPMS/
-            build/SRPMS/
+            build/
+
+      - name: Display structure of downloaded files
+        run: ls -R
 
       - name: Install RPMInspect
         run: |

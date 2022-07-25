@@ -3,11 +3,15 @@
 # Don't run metadata check as we can't know the build host subdomain
 # of CI runners in advance to add to an allow list
 
+echo "$PWD"
+echo "$(ls -la build)"
+echo "$(ls -la build/SRPMS)"
+echo "$(ls -la build/RPMS)"
 echo "Running RPMInspect on SRPM"
-rpminspect-fedora -E metadata /build/SRPMS/*.rpm
+rpminspect-fedora -E metadata build/SRPMS/*.rpm
 
 # Run RPMInspect on RPMs
-for f in /build/RPMS/*rpm; do
+for f in build/RPMS/*rpm; do
 
   echo "::group::Running RPMInspect on $f"
   if [[ "$f" == *"dogtag-pki-tools-"[0-9]* ]]
