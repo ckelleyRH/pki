@@ -60,7 +60,8 @@ jobs:
               -D pki_ds_ldap_port=3389 \
               -D pki_cert_id_generator=random \
               -D pki_request_id_generator=random \
-              -v
+              -v \
+              --debug 
 
           # set buffer size to 0 so that revocation takes effect immediately
           docker exec pki pki-server ca-config-set auths.revocationChecking.bufferSize 0
