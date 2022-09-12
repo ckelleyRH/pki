@@ -62,6 +62,14 @@ jobs:
       - name: Build PKI packages
         run: ./build.sh --with-timestamp --work-dir=build rpm
 
+      - name: Upload PKI packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: pki-build-${{ matrix.os }}
+          path: |
+            build/RPMS/
+            build/SRPMS/
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
@@ -74,10 +82,27 @@ jobs:
             COPR_REPO=${{ needs.init.outputs.repo }}
           tags: pki-runner
           target: pki-runner
-          outputs: type=docker,dest=pki-${{ inputs.key_container}}-runner.tar
+          outputs: type=docker,dest=pki-runner.tar
 
       - name: Store runner image
         uses: actions/cache@v3
         with:
-          key: pki-${{ inputs.key_container }}-runner-${{ matrix.os }}-${{ github.run_id }}
-          path: pki-${{ inputs.key_container }}-runner.tar
+          key: pki-runner-${{ github.run_id }}
+          path: pki-runner.tar
+
+      - name: Build CA server image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          build-args: |
+            OS_VERSION=${{ matrix.os }}
+            COPR_REPO=${{ needs.init.outputs.repo }}
+          tags: pki-ca
+          target: pki-ca
+          outputs: type=docker,dest=pki-ca-server.tar
+
+      - name: Store CA server image
+        uses: actions/cache@v3
+        with:
+          key: pki-ca-server-${{ github.run_id }}
+          path: pki-ca-server.tar

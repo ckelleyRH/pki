@@ -1,0 +1,25 @@
+name: PKI Tests
+
+on: [push, pull_request]
+
+jobs:
+  call-build-workflow:
+    uses: ./.github/workflows/build.yml
+    with:
+      key_container: ca
+    secrets: inherit
+
+  ca-tests:
+    name: CA Tests
+    needs: call-build-workflow
+    uses: ./.github/workflows/ca-tests.yml
+    with:
+      repo: ${{ needs.call-build-workflow.outputs.repo }}
+      db-image: ${{ needs.call-build-workflow.outputs.db-image }}
+
+  scep-test:
+    name: SCEP responder
+    needs: [call-build-workflow, ca-publishing-crl-file-test]
+    uses: ./.github/workflows/scep-test.yml
+    with:
+      db-image: ${{ needs.call-build-workflow.outputs.db-image }}

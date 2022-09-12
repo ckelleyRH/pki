@@ -3,7 +3,7 @@ name: Basic Sub-CA
 on:
   workflow_call:
     inputs:
-      os:
+      db-image:
         required: true
         type: string
 
@@ -21,11 +21,11 @@ jobs:
       - name: Retrieve runner image
         uses: actions/cache@v3
         with:
-          key: pki-ca-runner-${{ inputs.os }}-${{ github.run_id }}
-          path: pki-ca-runner.tar
+          key: pki-runner-${{ github.run_id }}
+          path: pki-runner.tar
 
       - name: Load runner image
-        run: docker load --input pki-ca-runner.tar
+        run: docker load --input pki-runner.tar
 
       - name: Create network
         run: docker network create example
@@ -34,7 +34,7 @@ jobs:
         run: |
           tests/bin/ds-container-create.sh rootds
         env:
-          IMAGE: ${{ needs.init.outputs.db-image }}
+          IMAGE: ${{ inputs.db-image }}
           HOSTNAME: rootds.example.com
           PASSWORD: Secret.123
 
@@ -70,7 +70,7 @@ jobs:
         run: |
           tests/bin/ds-container-create.sh subds
         env:
-          IMAGE: ${{ needs.init.outputs.db-image }}
+          IMAGE: ${{ inputs.db-image }}
           HOSTNAME: subds.example.com
           PASSWORD: Secret.123
 
@@ -170,7 +170,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: subca-basic-root-${{ inputs.os }}
+          name: subca-basic-root
           path: |
             /tmp/artifacts/root
 
@@ -178,6 +178,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: subca-basic-subordinate-${{ inputs.os }}
+          name: subca-basic-subordinate
           path: |
             /tmp/artifacts/subordinate

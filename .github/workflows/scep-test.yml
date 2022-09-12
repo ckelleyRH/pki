@@ -3,7 +3,7 @@ name: SCEP responder
 on:
   workflow_call:
     inputs:
-      os:
+      db-image:
         required: true
         type: string
 
@@ -20,11 +20,11 @@ jobs:
       - name: Retrieve runner image
         uses: actions/cache@v3
         with:
-          key: pki-ca-runner-${{ inputs.os }}-${{ github.run_id }}
-          path: pki-ca-runner.tar
+          key: pki-runner-${{ github.run_id }}
+          path: pki-runner.tar
 
       - name: Load runner image
-        run: docker load --input pki-ca-runner.tar
+        run: docker load --input pki-runner.tar
 
       - name: Create network
         run: docker network create example
@@ -33,7 +33,7 @@ jobs:
         run: |
           tests/bin/ds-container-create.sh ds
         env:
-          IMAGE: ${{ needs.init.outputs.db-image }}
+          IMAGE: ${{ inputs.db-image }}
           HOSTNAME: ds.example.com
           PASSWORD: Secret.123
 
@@ -122,6 +122,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: scep-${{ inputs.os }}
+          name: scep
           path: |
             /tmp/artifacts/pki

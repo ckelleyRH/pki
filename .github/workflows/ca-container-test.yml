@@ -3,7 +3,10 @@ name: CA container
 on:
   workflow_call:
     inputs:
-      os:
+      repo:
+        required: true
+        type: string
+      db-image:
         required: true
         type: string
 
@@ -21,16 +24,16 @@ jobs:
       - name: Retrieve runner image
         uses: actions/cache@v3
         with:
-          key: pki-ca-runner-${{ inputs.os }}-${{ github.run_id }}
-          path: pki-ca-runner.tar
+          key: pki-runner-${{ github.run_id }}
+          path: pki-runner.tar
 
       - name: Load runner image
-        run: docker load --input pki-ca-runner.tar
+        run: docker load --input pki-runner.tar
 
       - name: Retrieve server image
         uses: actions/cache@v3
         with:
-          key: pki-ca-server-${{ inputs.os }}-${{ github.run_id }}
+          key: pki-ca-server-${{ github.run_id }}
           path: pki-ca-server.tar
 
       - name: Load CA image
@@ -200,8 +203,8 @@ jobs:
         run: |
           tests/bin/ds-container-create.sh ds
         env:
-          IMAGE: ${{ needs.init.outputs.db-image }}
-          COPR_REPO: ${{ needs.init.outputs.repo }}
+          IMAGE: ${{ inputs.db-image }}
+          COPR_REPO: ${{ inputs.repo }}
           HOSTNAME: ds.example.com
           PASSWORD: Secret.123
 
@@ -683,12 +686,12 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: ca-container-ca-${{ inputs.os }}
+          name: ca-container-ca
           path: /tmp/artifacts/ca
 
       - name: Upload artifacts from client container
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: ca-container-client-${{ inputs.os }}
+          name: ca-container-client
           path: /tmp/artifacts/client
