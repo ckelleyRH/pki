@@ -278,10 +278,10 @@ public class CertificateAuthority implements IAuthority, ICertificateAuthority, 
         if (!authorityEnabled)
             throw new CADisabledException("Authority is disabled");
         if (!isReady()) {
-            if (signingUnitException != null)
-                throw signingUnitException;
-            else
+            if (signingUnitException == null) {
                 throw new CAMissingKeyException("Authority does not yet have signing key and cert in local NSSDB");
+            }
+            throw signingUnitException;
         }
     }
 
@@ -469,10 +469,7 @@ public class CertificateAuthority implements IAuthority, ICertificateAuthority, 
      * @return true if this is a clone CA
      */
     public boolean isClone() {
-        if (CAService.mCLAConnector != null)
-            return true;
-        else
-            return false;
+        return CAService.mCLAConnector != null;
     }
 
     /**
@@ -543,11 +540,7 @@ public class CertificateAuthority implements IAuthority, ICertificateAuthority, 
 
         try {
             BigInteger serial = certificateRepository.peekNextSerialNumber();
-
-            if (serial == null)
-                return "";
-            else
-                return serial.toString(16);
+            return serial == null ? "" : serial.toString(16);
         } catch (EBaseException e) {
             // shouldn't get here.
             return "";
@@ -576,12 +569,7 @@ public class CertificateAuthority implements IAuthority, ICertificateAuthority, 
         CAEngine engine = CAEngine.getInstance();
         CertificateRepository certificateRepository = engine.getCertificateRepository();
         BigInteger serial = certificateRepository.getMaxSerial();
-
-        if (serial != null) {
-            return serial.toString(certificateRepository.getRadix());
-        } else {
-            return "";
-        }
+        return serial == null ? "" : serial.toString(certificateRepository.getRadix());
     }
 
     /**
