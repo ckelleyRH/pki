@@ -8,6 +8,7 @@
 #
 
 import logging
+import re
 from contextlib import contextmanager
 
 from pki.server.healthcheck.meta.plugin import MetaPlugin, registry
@@ -37,6 +38,9 @@ def compare_nssdb_with_cs(class_instance, subsystem, cert_tag):
     # Load cert from CS
     cert = subsystem.get_cert_info(cert_tag)
     cert_cs = cert['data']
+    print("cert_cs")
+    print(type(cert_cs))
+    print(cert_cs)
 
     # Load cert from NSSDB
     with nssdb_connection(subsystem.instance) as nssdb:
@@ -46,7 +50,7 @@ def compare_nssdb_with_cs(class_instance, subsystem, cert_tag):
             cert_nssdb = nssdb.get_cert(
                 nickname=cert['nickname'],
                 token=cert['token'],
-                output_format='base64'
+                output_format='pem'
             )
         except Exception as e:  # pylint: disable=broad-except
             logger.debug('Unable to load cert from NSSDB: %s', str(e))
@@ -55,22 +59,29 @@ def compare_nssdb_with_cs(class_instance, subsystem, cert_tag):
                           nssdbDir=subsystem.instance.nssdb_dir,
                           msg='Unable to load cert from NSSDB: %s' % str(e))
 
-    # Compare whether the certs match
-    if cert_nssdb != cert_cs:
-        directive = '%s.%s.cert' % (subsystem.name, cert_tag)
-        return Result(class_instance, constants.ERROR,
-                      key=cert_id,
-                      nickname=cert['nickname'],
-                      directive=directive,
-                      configfile=subsystem.cs_conf,
-                      msg='Certificate \'%s\' does not match the value '
-                          'of %s in %s' % (cert['nickname'],
-                                           directive,
-                                           subsystem.cs_conf))
-    else:
-        return Result(class_instance, constants.SUCCESS,
-                      key=cert_id,
-                      configfile=subsystem.cs_conf)
+    # base64 blob may contain multiple certs so, compare each in turn
+    cert_split = re.findall(b'^[^-]+$', cert_nssdb, re.M)
+    print("cert_split")
+    print(type(cert_split))
+    print(cert_split)
+    for c in cert_split:
+        print("cert")
+        print(type(c))
+        print(c)
+        if cert_cs == c.decode().replace('\r\n', ''):
+            return Result(class_instance, constants.SUCCESS,
+                          key=cert_id,
+                          configfile=subsystem.cs_conf)
+    directive = '%s.%s.cert' % (subsystem.name, cert_tag)
+    return Result(class_instance, constants.ERROR,
+                  key=cert_id,
+                  nickname=cert['nickname'],
+                  directive=directive,
+                  configfile=subsystem.cs_conf,
+                  msg='Certificate \'%s\' does not match the value '
+                      'of %s in %s' % (cert['nickname'],
+                                       directive,
+                                       subsystem.cs_conf))
 
 
 @registry
