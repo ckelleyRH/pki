@@ -77,6 +77,7 @@ public class UGSubsystem {
     protected static final String LDAP_ATTR_CERTDN = "seeAlso";
     protected static final String LDAP_ATTR_USER_CERT = "userCertificate";
     protected static final String LDAP_ATTR_PROFILE_ID = "profileID";
+    protected static final String LDAP_ATTR_NS_PAGED_SIZE_LIMIT = "20000";
 
     protected transient LdapBoundConnFactory mLdapConnFactory = null;
     protected String mBaseDN = null;
@@ -697,6 +698,9 @@ public class UGSubsystem {
             }
             attrs.add(attr);
         }
+
+        logger.debug("UGSubsystem: - nsPagedSizeLimit: " + LDAP_ATTR_NS_PAGED_SIZE_LIMIT);
+        attrs.add(new LDAPAttribute("nsPagedSizeLimit", LDAP_ATTR_NS_PAGED_SIZE_LIMIT));
 
         LDAPEntry entry = new LDAPEntry(dn, attrs);
 
