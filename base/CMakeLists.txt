@@ -252,13 +252,6 @@ find_file(RESTEASY_CLIENT_JAR
         /usr/share/java/resteasy
 )
 
-find_file(RESTEASY_JACKSON2_PROVIDER_JAR
-    NAMES
-        resteasy-jackson2-provider.jar
-    PATHS
-        /usr/share/java/resteasy
-)
-
 find_file(JASPIC_API_JAR
     NAMES
         jaspic-api.jar

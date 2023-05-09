@@ -131,7 +131,6 @@ add_custom_command(
     COMMAND ln -sf ../../../..${JAVA_JAR_INSTALL_DIR}/pki/pki-common.jar ${CMAKE_CURRENT_BINARY_DIR}/lib/pki-common.jar
     COMMAND ln -sf ../../../..${JAVA_JAR_INSTALL_DIR}/pki/pki-tools.jar ${CMAKE_CURRENT_BINARY_DIR}/lib/pki-tools.jar
     COMMAND ln -sf ../../../..${RESTEASY_CLIENT_JAR} lib/resteasy-client.jar
-    COMMAND ln -sf ../../../..${RESTEASY_JACKSON2_PROVIDER_JAR} lib/resteasy-jackson2-provider.jar
     COMMAND ln -sf ../../../..${RESTEASY_JAXRS_JAR} lib/resteasy-jaxrs.jar
     COMMAND ln -sf ../../../..${SERVLET_JAR} lib/servlet.jar
     COMMAND ln -sf ../../../..${SLF4J_API_JAR} lib/slf4j-api.jar
