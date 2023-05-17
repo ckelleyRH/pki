@@ -285,7 +285,6 @@ public class AgentCertService extends PKIService implements AgentCertResource {
         try {
             processor.processRevocationRequest();
             processor.auditChangeRequestProcessed(ILogger.SUCCESS);
-
         } catch (EBaseException e) {
             logger.error("Unable to process revocation request: " + e.getMessage(), e);
             processor.auditChangeRequestProcessed(ILogger.FAILURE);
