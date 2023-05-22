@@ -9,9 +9,9 @@ jobs:
     secrets: inherit
 
   build:
-    name: Waiting for build
+    name: Waiting for ACME build
     needs: init
-    uses: ./.github/workflows/wait-for-build.yml
+    uses: ./.github/workflows/wait-for-acme-build.yml
     secrets: inherit
 
   acme-certbot-test:
