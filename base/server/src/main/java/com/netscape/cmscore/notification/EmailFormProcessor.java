@@ -18,7 +18,7 @@
 package com.netscape.cmscore.notification;
 
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -93,7 +93,7 @@ public class EmailFormProcessor {
 
     // stores the eventual content of the email
     Vector<String> mContent = new Vector<>();
-    Hashtable<String, Object> mTok2vals = null;
+    Map<String, Object> mTok2vals = null;
 
     public EmailFormProcessor() {
     }
@@ -108,7 +108,7 @@ public class EmailFormProcessor {
      * @return mail content
      */
     public String getEmailContent(String form,
-            Hashtable<String, Object> tok2vals) {
+            Map<String, Object> tok2vals) {
         mTok2vals = tok2vals;
 
         if (form == null) {
@@ -173,16 +173,13 @@ public class EmailFormProcessor {
              * token name should not be a substring of any token name
              */
             boolean matched = false;
-            String tok = null;
 
-            for (Enumeration<String> e = mTok2vals.keys(); e.hasMoreElements();) {
-                // get key
-                tok = e.nextElement();
+            for (String e : mTok2vals.keySet()) {
 
                 // compare key with $token
-                if (t.startsWith(tok)) {
+                if (t.startsWith(e)) {
                     // match, put val in mContent
-                    Object o = mTok2vals.get(tok);
+                    Object o = mTok2vals.get(e);
 
                     if (o != null) {
                         String s = (String) o;
@@ -197,8 +194,8 @@ public class EmailFormProcessor {
                     }
 
                     // now, put the rest of the non-token string in mContent
-                    if (t.length() != tok.length()) {
-                        mContent.add(t.substring(tok.length()));
+                    if (t.length() != e.length()) {
+                        mContent.add(t.substring(e.length()));
                     }
 
                     matched = true;

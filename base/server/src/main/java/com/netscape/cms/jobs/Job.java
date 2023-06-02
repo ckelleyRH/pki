@@ -18,7 +18,8 @@
 package com.netscape.cms.jobs;
 
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.mozilla.jss.netscape.security.x509.X509CertImpl;
 
@@ -73,8 +74,8 @@ public abstract class Job implements Runnable {
     protected String mItemForm = null;
     protected String mSummarySenderEmail = null;
     protected String mSummaryReceiverEmail = null;
-    protected Hashtable<String, Object> mContentParams = new Hashtable<>();
-    protected Hashtable<String, Object> mItemParams = new Hashtable<>();
+    protected Map<String, Object> mContentParams = new HashMap<>();
+    protected Map<String, Object> mItemParams = new HashMap<>();
 
     boolean stopped;
 
