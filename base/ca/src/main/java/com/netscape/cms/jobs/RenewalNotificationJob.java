@@ -83,70 +83,37 @@ public class RenewalNotificationJob
         extends Job
         implements IExtendedPluginInfo {
 
-    // config parameters...
-    public static final String PROP_CRON = "cron";
-
     /**
      * Profile ID specifies which profile approves the certificate.
      */
-    public static final String PROP_PROFILE_ID = "profileId";
+    private static final String PROFILE_ID = "profileId";
 
     /**
      * This job will send notification at this much time before the
-     * enpiration date
+     * expiration date
      */
-    public static final String PROP_NOTIFYTRIGGEROFFSET =
-            "notifyTriggerOffset";
+    private static final String NOTIFY_TRIGGER_OFFSET = "notifyTriggerOffset";
 
     /**
      * This job will stop sending notification this much time after
      * the expiration date
      */
-    public static final String PROP_NOTIFYENDOFFSET = "notifyEndOffset";
+    private static final String NOTIFY_END_OFFSET = "notifyEndOffset";
 
     /**
      * sender email address as appeared on the notification email
      */
-    public static final String PROP_SENDEREMAIL =
-            "senderEmail";
+    private static final String SENDER_EMAIL = "senderEmail";
 
     /**
      * email subject line as appeared on the notification email
      */
-    public static final String PROP_EMAILSUBJECT =
-            "emailSubject";
+    private static final String EMAIL_SUBJECT = "emailSubject";
 
     /**
      * location of the template file used for email notification
      */
-    public static final String PROP_EMAILTEMPLATE = "emailTemplate";
-    public static final String PROP_MAXNOTIFYCOUNT = "maxNotifyCount";
-
-    /**
-     * sender email as appeared on the notification summary email
-     */
-    public static final String PROP_SUMMARY_SENDEREMAIL = "summary.senderEmail";
-
-    /**
-     * recipient of the notification summary email
-     */
-    public static final String PROP_SUMMARY_RECIPIENTEMAIL = "summary.recipientEmail";
-
-    /**
-     * email subject as appeared on the notification summary email
-     */
-    public static final String PROP_SUMMARY_SUBJECT = "summary.emailSubject";
-
-    /**
-     * location of the email template used for notification summary
-     */
-    public static final String PROP_SUMMARY_TEMPLATE = "summary.emailTemplate";
-
-    /**
-     * location of the template file for each item appeared on the
-     * notification summary
-     */
-    public static final String PROP_SUMMARY_ITEMTEMPLATE = "summary.itemTemplate";
+    private static final String EMAIL_TEMPLATE = "emailTemplate";
 
     /*
      * Holds configuration parameters accepted by this implementation.
@@ -156,20 +123,20 @@ public class RenewalNotificationJob
      */
     protected static String[] mConfigParams =
             new String[] {
-                    "enabled",
-                    PROP_CRON,
-                    PROP_PROFILE_ID,
-                    PROP_NOTIFYTRIGGEROFFSET,
-                    PROP_NOTIFYENDOFFSET,
-                    PROP_SENDEREMAIL,
-                    PROP_EMAILSUBJECT,
-                    PROP_EMAILTEMPLATE,
-                    "summary.enabled",
-                    PROP_SUMMARY_RECIPIENTEMAIL,
-                    PROP_SUMMARY_SENDEREMAIL,
-                    PROP_SUMMARY_SUBJECT,
-                    PROP_SUMMARY_ITEMTEMPLATE,
-                    PROP_SUMMARY_TEMPLATE,
+                    ENABLED,
+                    CRON,
+                    PROFILE_ID,
+                    NOTIFY_TRIGGER_OFFSET,
+                    NOTIFY_END_OFFSET,
+                    SENDER_EMAIL,
+                    EMAIL_SUBJECT,
+                    EMAIL_TEMPLATE,
+                    SUMMARY_ENABLED,
+                    SUMMARY_RECIPIENT_EMAIL,
+                    SUMMARY_SENDER_EMAIL,
+                    SUMMARY_EMAIL_SUBJECT,
+                    SUMMARY_ITEM_TEMPLATE,
+                    SUMMARY_EMAIL_TEMPLATE,
         };
 
     protected CertificateRepository mCertDB;
@@ -208,34 +175,34 @@ public class RenewalNotificationJob
                         "notifyTriggerOffset before and notifyEndOffset after " +
                         "the expiration date",
 
-                PROP_PROFILE_ID + ";string;Specify the ID of the profile which " +
+                PROFILE_ID + ";string;Specify the ID of the profile which " +
                         "approved the certificates that are about to expire. For multiple " +
                         "profiles, each entry is separated by white space. For example, " +
                         "if the administrator just wants to give automated notification " +
                         "when the SSL server certificates are about to expire, then " +
                         "he should enter \"caServerCert caAgentServerCert\" in the profileId textfield. " +
                         "Blank field means all profiles.",
-                PROP_NOTIFYTRIGGEROFFSET + ";number,required;How long (in days) before " +
+                NOTIFY_TRIGGER_OFFSET + ";number,required;How long (in days) before " +
                         "certificate expiration will the first notification " +
                         "be sent",
-                PROP_NOTIFYENDOFFSET + ";number,required;How long (in days) after " +
+                NOTIFY_END_OFFSET + ";number,required;How long (in days) after " +
                         "certificate expiration will notifications " +
                         "continue to be resent if certificate is not renewed",
-                PROP_CRON + ";string,required;Format: minute hour dayOfMonth Mmonth " +
+                CRON + ";string,required;Format: minute hour dayOfMonth Mmonth " +
                         "dayOfWeek. Use '*' for 'every'. For dayOfWeek, 0 is Sunday",
-                PROP_SENDEREMAIL + ";string,required;Specify the address to be used " +
+                SENDER_EMAIL + ";string,required;Specify the address to be used " +
                         "as the email's 'sender'. Bounces go to this address.",
-                PROP_EMAILSUBJECT + ";string,required;Email subject",
-                PROP_EMAILTEMPLATE + ";string,required;Fully qualified pathname of " +
+                EMAIL_SUBJECT + ";string,required;Email subject",
+                EMAIL_TEMPLATE + ";string,required;Fully qualified pathname of " +
                         "template file of email to be sent",
                 "enabled;boolean;Enable this plugin",
                 "summary.enabled;boolean;Enabled sending of summaries",
-                PROP_SUMMARY_SENDEREMAIL + ";string,required;Sender email address of summary",
-                PROP_SUMMARY_RECIPIENTEMAIL + ";string,required;Who should receive summaries",
-                PROP_SUMMARY_SUBJECT + ";string,required;Subject of summary email",
-                PROP_SUMMARY_TEMPLATE + ";string,required;Fully qualified pathname of " +
+                SUMMARY_SENDER_EMAIL + ";string,required;Sender email address of summary",
+                SUMMARY_RECIPIENT_EMAIL + ";string,required;Who should receive summaries",
+                SUMMARY_EMAIL_SUBJECT + ";string,required;Subject of summary email",
+                SUMMARY_EMAIL_TEMPLATE + ";string,required;Fully qualified pathname of " +
                         "template file of email to be sent",
-                PROP_SUMMARY_ITEMTEMPLATE + ";string,required;Fully qualified pathname of " +
+                SUMMARY_ITEM_TEMPLATE + ";string,required;Fully qualified pathname of " +
                         "file with template to be used for each summary item",
                 IExtendedPluginInfo.HELP_TOKEN +
                         ";configuration-jobrules-renewalnotification",
@@ -275,28 +242,28 @@ public class RenewalNotificationJob
             mHttpPort = caEngine.getEESSLPort();
 
             // read from the configuration file
-            mPreDays = mConfig.getInteger(PROP_NOTIFYTRIGGEROFFSET, 30); // in days
-            mPostDays = mConfig.getInteger(PROP_NOTIFYENDOFFSET, 15); // in days
+            mPreDays = mConfig.getInteger(NOTIFY_TRIGGER_OFFSET, 30); // in days
+            mPostDays = mConfig.getInteger(NOTIFY_END_OFFSET, 15); // in days
 
-            mEmailSender = mConfig.getString(PROP_SENDEREMAIL);
-            mEmailSubject = mConfig.getString(PROP_EMAILSUBJECT);
-            mEmailTemplateName = mConfig.getString(PROP_EMAILTEMPLATE);
+            mEmailSender = mConfig.getString(SENDER_EMAIL);
+            mEmailSubject = mConfig.getString(EMAIL_SUBJECT);
+            mEmailTemplateName = mConfig.getString(EMAIL_TEMPLATE);
 
             // initialize the summary related config info
-            ConfigStore sc = mConfig.getSubStore(PROP_SUMMARY, ConfigStore.class);
+            ConfigStore sc = mConfig.getSubStore(SUMMARY, ConfigStore.class);
 
-            if (sc.getBoolean(PROP_ENABLED, false)) {
+            if (sc.getBoolean(ENABLED, false)) {
                 mSummary = true;
                 mSummaryItemTemplateName =
-                        mConfig.getString(PROP_SUMMARY_ITEMTEMPLATE);
+                        mConfig.getString(SUMMARY_ITEM_TEMPLATE);
                 mSummarySenderEmail =
-                        mConfig.getString(PROP_SUMMARY_SENDEREMAIL);
+                        mConfig.getString(SUMMARY_SENDER_EMAIL);
                 mSummaryReceiverEmail =
-                        mConfig.getString(PROP_SUMMARY_RECIPIENTEMAIL);
+                        mConfig.getString(SUMMARY_RECIPIENT_EMAIL);
                 mSummaryMailSubject =
-                        mConfig.getString(PROP_SUMMARY_SUBJECT);
+                        mConfig.getString(SUMMARY_EMAIL_SUBJECT);
                 mSummaryTemplateName =
-                        mConfig.getString(PROP_SUMMARY_TEMPLATE);
+                        mConfig.getString(SUMMARY_EMAIL_TEMPLATE);
             } else {
                 mSummary = false;
             }
@@ -344,7 +311,7 @@ public class RenewalNotificationJob
             StringBuffer f = new StringBuffer();
             String profileId = "";
             try {
-                profileId = mConfig.getString(PROP_PROFILE_ID, "");
+                profileId = mConfig.getString(PROFILE_ID, "");
             } catch (EBaseException ee) {
             }
 
@@ -577,7 +544,7 @@ class CertRecProcessor extends ElementProcessor {
                 mIC.mNumFail++;
                 numFailCounted = true;
                 if (mJob.mSummary == true)
-                    mJob.buildItemParams(EmailFormProcessor.TOKEN_STATUS, Job.STATUS_FAILURE);
+                    mJob.buildItemParams(EmailFormProcessor.TOKEN_STATUS, Job.FAILED);
                 logger.warn("CertRecProcessor: " + CMS.getLogMessage("JOBS_GET_CERT_ERROR",
                                 cr.getCertificate().getSerialNumber().toString(16)));
             } else {
@@ -617,13 +584,13 @@ class CertRecProcessor extends ElementProcessor {
                     req,
                     cr);
 
-            mJob.buildItemParams(EmailFormProcessor.TOKEN_STATUS, Job.STATUS_SUCCESS);
+            mJob.buildItemParams(EmailFormProcessor.TOKEN_STATUS, Job.SUCCEEDED);
 
             mIC.mNumSuccessful++;
 
         } catch (Exception e) {
             logger.warn("RenewalNotificationJob: " + e.getMessage(), e);
-            mJob.buildItemParams(EmailFormProcessor.TOKEN_STATUS, Job.STATUS_FAILURE);
+            mJob.buildItemParams(EmailFormProcessor.TOKEN_STATUS, Job.FAILED);
             if (numFailCounted == false) {
                 mIC.mNumFail++;
             }

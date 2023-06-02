@@ -47,7 +47,8 @@ import com.netscape.cmscore.request.RequestQueue;
  */
 public class RequestInQueueJob extends Job
         implements IExtendedPluginInfo {
-    protected static final String PROP_SUBSYSTEM_ID = "subsystemId";
+
+    private static final String SUBSYSTEM_ID = "subsystemId";
 
     IAuthority mSub = null;
     RequestQueue mReqQ;
@@ -60,14 +61,14 @@ public class RequestInQueueJob extends Job
      */
     protected static String[] mConfigParams =
             new String[] {
-                    "enabled",
-                    "cron",
-                    "subsystemId",
-                    "summary.enabled",
-                    "summary.emailSubject",
-                    "summary.emailTemplate",
-                    "summary.senderEmail",
-                    "summary.recipientEmail"
+                    ENABLED,
+                    CRON,
+                    SUBSYSTEM_ID,
+                    SUMMARY_ENABLED,
+                    SUMMARY_EMAIL_SUBJECT,
+                    SUMMARY_EMAIL_TEMPLATE,
+                    SUMMARY_SENDER_EMAIL,
+                    SUMMARY_RECIPIENT_EMAIL
         };
 
     /**
@@ -114,7 +115,7 @@ public class RequestInQueueJob extends Job
         super.init(scheduler, id, implName, config);
 
         // read from the configuration file
-        String sub = mConfig.getString(PROP_SUBSYSTEM_ID);
+        String sub = mConfig.getString(SUBSYSTEM_ID);
 
         mSub = (IAuthority) engine.getSubsystem(sub);
         if (mSub == null) {
@@ -126,26 +127,26 @@ public class RequestInQueueJob extends Job
         mReqQ = engine.getRequestQueue();
 
         // initialize the summary related config info
-        ConfigStore sc = mConfig.getSubStore(PROP_SUMMARY, ConfigStore.class);
-        boolean enabled = sc.getBoolean(PROP_ENABLED, false);
+        ConfigStore sc = mConfig.getSubStore(SUMMARY, ConfigStore.class);
+        boolean enabled = sc.getBoolean(ENABLED, false);
         logger.info("RequestInQueueJob: - enabled: " + enabled);
 
         if (enabled) {
             mSummary = true;
 
-            mSummaryMailSubject = sc.getString(PROP_EMAIL_SUBJECT);
+            mSummaryMailSubject = sc.getString(EMAIL_SUBJECT);
             logger.info("RequestInQueueJob: - subject: " + mSummaryMailSubject);
 
-            mMailForm = sc.getString(PROP_EMAIL_TEMPLATE);
+            mMailForm = sc.getString(EMAIL_TEMPLATE);
             logger.info("RequestInQueueJob: - mail template: " + mMailForm);
 
             // mItemForm = sc.getString(PROP_ITEM_TEMPLATE);
             // logger.info("RequestInQueueJob: - item template: " + mItemForm);
 
-            mSummarySenderEmail = sc.getString(PROP_SENDER_EMAIL);
+            mSummarySenderEmail = sc.getString(SENDER_EMAIL);
             logger.info("RequestInQueueJob: - sender email: " + mSummarySenderEmail);
 
-            mSummaryReceiverEmail = sc.getString(PROP_RECEIVER_EMAIL);
+            mSummaryReceiverEmail = sc.getString(RECIPIENT_EMAIL);
             logger.info("RequestInQueueJob: - receiver email: " + mSummaryReceiverEmail);
 
         } else {

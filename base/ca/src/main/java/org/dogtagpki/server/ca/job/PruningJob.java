@@ -34,6 +34,15 @@ import com.netscape.cmscore.request.RequestRepository;
  */
 public class PruningJob extends Job implements IExtendedPluginInfo {
 
+    private static final String REQUEST_SEARCH_TIME_LIMIT = "requestSearchTimeLimit";
+    private static final String REQUEST_SEARCH_SIZE_LIMIT = "requestSearchSizeLimit";
+    private static final String REQUEST_RETENTION_UNIT = "requestRetentionUnit";
+    private static final String REQUEST_RETENTION_TIME = "requestRetentionTime";
+    private static final String CERT_SEARCH_TIME_LIMIT = "certSearchTimeLimit";
+    private static final String CERT_SEARCH_SIZE_LIMIT = "certSearchSizeLimit";
+    private static final String CERT_RETENTION_UNIT = "certRetentionUnit";
+    private static final String CERT_RETENTION_TIME = "certRetentionTime";
+
     int certRetentionTime;
     int certRetentionUnit;
     int certSearchSizeLimit;
@@ -50,16 +59,16 @@ public class PruningJob extends Job implements IExtendedPluginInfo {
     @Override
     public String[] getConfigParams() {
         return new String[] {
-                "enabled",
-                "cron",
-                "certRetentionTime",
-                "certRetentionUnit",
-                "certSearchSizeLimit",
-                "certSearchTimeLimit",
-                "requestRetentionTime",
-                "requestRetentionUnit",
-                "requestSearchSizeLimit",
-                "requestSearchTimeLimit"
+                ENABLED,
+                CRON,
+                CERT_RETENTION_TIME,
+                CERT_RETENTION_UNIT,
+                CERT_SEARCH_SIZE_LIMIT,
+                CERT_SEARCH_TIME_LIMIT,
+                REQUEST_RETENTION_TIME,
+                REQUEST_RETENTION_UNIT,
+                REQUEST_SEARCH_SIZE_LIMIT,
+                REQUEST_SEARCH_TIME_LIMIT
         };
     }
 
@@ -115,34 +124,34 @@ public class PruningJob extends Job implements IExtendedPluginInfo {
         requestRepository = caEngine.getRequestRepository();
         certRepository = caEngine.getCertificateRepository();
 
-        certRetentionTime = config.getInteger("certRetentionTime", 30);
+        certRetentionTime = config.getInteger(CERT_RETENTION_TIME, 30);
         logger.info("PruningJob: - cert retention time: " + certRetentionTime);
 
-        String certRetentionUnitStr = config.getString("certRetentionUnit", "day");
+        String certRetentionUnitStr = config.getString(CERT_RETENTION_UNIT, "day");
         logger.info("PruningJob: - cert retention unit: " + certRetentionUnitStr);
         certRetentionUnit = parseRetentionUnit(certRetentionUnitStr);
 
         // default LDAPSearchConstraints.maxRes is 1000
-        certSearchSizeLimit = config.getInteger("certSearchSizeLimit", 1000);
+        certSearchSizeLimit = config.getInteger(CERT_SEARCH_SIZE_LIMIT, 1000);
         logger.info("PruningJob: - cert search size limit: " + certSearchSizeLimit);
 
         // default LDAPSearchConstraints.serverTimeLimit is 0
-        certSearchTimeLimit = config.getInteger("certSearchTimeLimit", 0);
+        certSearchTimeLimit = config.getInteger(CERT_SEARCH_TIME_LIMIT, 0);
         logger.info("PruningJob: - cert search time limit: " + certSearchTimeLimit);
 
-        requestRetentionTime = config.getInteger("requestRetentionTime", 30);
+        requestRetentionTime = config.getInteger(REQUEST_RETENTION_TIME, 30);
         logger.info("PruningJob: - request retention time: " + requestRetentionTime);
 
-        String requestRetentionUnitStr = config.getString("requestRetentionUnit", "day");
+        String requestRetentionUnitStr = config.getString(REQUEST_RETENTION_UNIT, "day");
         logger.info("PruningJob: - request retention unit: " + requestRetentionUnitStr);
         requestRetentionUnit = parseRetentionUnit(requestRetentionUnitStr);
 
         // default LDAPSearchConstraints.maxRes is 1000
-        requestSearchSizeLimit = config.getInteger("requestSearchSizeLimit", 1000);
+        requestSearchSizeLimit = config.getInteger(REQUEST_SEARCH_SIZE_LIMIT, 1000);
         logger.info("PruningJob: - request search size limit: " + requestSearchSizeLimit);
 
         // default LDAPSearchConstraints.serverTimeLimit is 0
-        requestSearchTimeLimit = config.getInteger("requestSearchTimeLimit", 0);
+        requestSearchTimeLimit = config.getInteger(REQUEST_SEARCH_TIME_LIMIT, 0);
         logger.info("PruningJob: - request search time limit: " + requestSearchTimeLimit);
     }
 

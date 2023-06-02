@@ -72,14 +72,14 @@ public class UnpublishExpiredJob extends Job
      */
     protected static String[] mConfigParams =
             new String[] {
-                    "enabled",
-                    "cron",
-                    "summary.enabled",
-                    "summary.emailSubject",
-                    "summary.emailTemplate",
-                    "summary.itemTemplate",
-                    "summary.senderEmail",
-                    "summary.recipientEmail"
+                    ENABLED,
+                    CRON,
+                    SUMMARY_ENABLED,
+                    SUMMARY_EMAIL_SUBJECT,
+                    SUMMARY_EMAIL_TEMPLATE,
+                    SUMMARY_ITEM_TEMPLATE,
+                    SUMMARY_SENDER_EMAIL,
+                    SUMMARY_RECIPIENT_EMAIL
         };
 
     @Override
@@ -124,15 +124,15 @@ public class UnpublishExpiredJob extends Job
         mPublisherProcessor = caEngine.getPublisherProcessor();
 
         // initialize the summary related config info
-        ConfigStore sc = mConfig.getSubStore(PROP_SUMMARY, ConfigStore.class);
+        ConfigStore sc = mConfig.getSubStore(SUMMARY, ConfigStore.class);
 
-        if (sc.getBoolean(PROP_ENABLED, false)) {
+        if (sc.getBoolean(ENABLED, false)) {
             mSummary = true;
-            mSummaryMailSubject = sc.getString(PROP_EMAIL_SUBJECT);
-            mMailForm = sc.getString(PROP_EMAIL_TEMPLATE);
-            mItemForm = sc.getString(PROP_ITEM_TEMPLATE);
-            mSummarySenderEmail = sc.getString(PROP_SENDER_EMAIL);
-            mSummaryReceiverEmail = sc.getString(PROP_RECEIVER_EMAIL);
+            mSummaryMailSubject = sc.getString(EMAIL_SUBJECT);
+            mMailForm = sc.getString(EMAIL_TEMPLATE);
+            mItemForm = sc.getString(ITEM_TEMPLATE);
+            mSummarySenderEmail = sc.getString(SENDER_EMAIL);
+            mSummaryReceiverEmail = sc.getString(RECIPIENT_EMAIL);
         } else {
             mSummary = false;
         }
@@ -209,7 +209,7 @@ public class UnpublishExpiredJob extends Job
             } catch (EBaseException e) {
                 negCount += 1;
                 if (mSummary == true)
-                    buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_FAILURE);
+                    buildItemParams(EmailFormProcessor.TOKEN_STATUS, FAILED);
                 logger.warn("UnpublishExpiredJob: " + CMS.getLogMessage("JOBS_META_INFO_ERROR",
                                 cert.getSerialNumber().toString(16) + e.getMessage()), e);
             }
@@ -222,14 +222,14 @@ public class UnpublishExpiredJob extends Job
             } catch (EBaseException e) {
                 negCount += 1;
                 if (mSummary == true)
-                    buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_FAILURE);
+                    buildItemParams(EmailFormProcessor.TOKEN_STATUS, FAILED);
                 logger.warn("UnpublishExpiredJob: " + CMS.getLogMessage("JOBS_META_REQUEST_ERROR",
                                 cert.getSerialNumber().toString(16) + e.getMessage()), e);
             } catch (NullPointerException e) {
                 // no requestId in MetaInfo...skip to next record
                 negCount += 1;
                 if (mSummary == true)
-                    buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_FAILURE);
+                    buildItemParams(EmailFormProcessor.TOKEN_STATUS, FAILED);
                 logger.warn("UnpublishExpiredJob: " + CMS.getLogMessage("JOBS_META_REQUEST_ERROR",
                                 cert.getSerialNumber().toString(16) + e.getMessage()), e);
             }
@@ -249,7 +249,7 @@ public class UnpublishExpiredJob extends Job
                 } catch (EBaseException e) {
                     negCount += 1;
                     if (mSummary == true)
-                        buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_FAILURE);
+                        buildItemParams(EmailFormProcessor.TOKEN_STATUS, FAILED);
                     logger.warn("UnpublishExpiredJob: " + CMS.getLogMessage("JOBS_FIND_REQUEST_ERROR",
                                     cert.getSerialNumber().toString(16) + e.getMessage()), e);
                 }
@@ -258,7 +258,7 @@ public class UnpublishExpiredJob extends Job
                             mPublisherProcessor.isCertPublishingEnabled()) {
                         mPublisherProcessor.unpublishCert(cert, req);
                         if (mSummary == true)
-                            buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_SUCCESS);
+                            buildItemParams(EmailFormProcessor.TOKEN_STATUS, SUCCEEDED);
                         count += 1;
                     } else {
                         negCount += 1;
@@ -266,7 +266,7 @@ public class UnpublishExpiredJob extends Job
                 } catch (Exception e) {
                     negCount += 1;
                     if (mSummary == true)
-                        buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_FAILURE);
+                        buildItemParams(EmailFormProcessor.TOKEN_STATUS, FAILED);
                     logger.warn("UnpublishExpiredJob: " + CMS.getLogMessage("JOBS_UNPUBLISH_ERROR",
                                     cert.getSerialNumber().toString(16) + e.getMessage()), e);
                 }
@@ -277,7 +277,7 @@ public class UnpublishExpiredJob extends Job
                             mPublisherProcessor.isCertPublishingEnabled()) {
                         mPublisherProcessor.unpublishCert(cert, null);
                         if (mSummary == true)
-                            buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_SUCCESS);
+                            buildItemParams(EmailFormProcessor.TOKEN_STATUS, SUCCEEDED);
                         count += 1;
                     } else {
                         negCount += 1;
@@ -285,7 +285,7 @@ public class UnpublishExpiredJob extends Job
                 } catch (Exception e) {
                     negCount += 1;
                     if (mSummary == true)
-                        buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_FAILURE);
+                        buildItemParams(EmailFormProcessor.TOKEN_STATUS, FAILED);
                     logger.warn("UnpublishExpiredJob: " + CMS.getLogMessage("JOBS_UNPUBLISH_ERROR",
                                     cert.getSerialNumber().toString(16) + e.getMessage()), e);
                 }

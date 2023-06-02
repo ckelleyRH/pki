@@ -45,17 +45,45 @@ public abstract class Job implements Runnable {
 
     public static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(Job.class);
 
-    // config parameters...
-    protected static final String PROP_SUMMARY = "summary";
-    protected static final String PROP_ENABLED = "enabled";
-    protected static final String PROP_EMAIL_SUBJECT = "emailSubject";
-    protected static final String PROP_EMAIL_TEMPLATE = "emailTemplate";
-    protected static final String PROP_ITEM_TEMPLATE = "itemTemplate";
-    protected static final String PROP_SENDER_EMAIL = "senderEmail";
-    protected static final String PROP_RECEIVER_EMAIL = "recipientEmail";
+    protected static final String SUMMARY = "summary";
+    protected static final String ENABLED = "enabled";
+    protected static final String CRON = "cron";
+    protected static final String EMAIL_SUBJECT = "emailSubject";
+    protected static final String EMAIL_TEMPLATE = "emailTemplate";
+    protected static final String ITEM_TEMPLATE = "itemTemplate";
+    protected static final String SENDER_EMAIL = "senderEmail";
+    protected static final String RECIPIENT_EMAIL = "recipientEmail";
 
-    protected static final String STATUS_FAILURE = "failed";
-    protected static final String STATUS_SUCCESS = "succeeded";
+    protected static final String FAILED = "failed";
+    protected static final String SUCCEEDED = "succeeded";
+
+    protected static final String SUMMARY_ENABLED = "summary.enabled";
+
+    /**
+     * email subject as appeared on the notification summary email
+     */
+    protected static final String SUMMARY_EMAIL_SUBJECT = "summary.emailSubject";
+
+    /**
+     * location of the email template used for notification summary
+     */
+    protected static final String SUMMARY_EMAIL_TEMPLATE = "summary.emailTemplate";
+
+    /**
+     * location of the template file for each item appeared on the
+     * notification summary
+     */
+    protected static final String SUMMARY_ITEM_TEMPLATE = "summary.itemTemplate";
+
+    /**
+     * sender email as appeared on the notification summary email
+     */
+    protected static final String SUMMARY_SENDER_EMAIL = "summary.senderEmail";
+
+    /**
+     * recipient of the notification summary email
+     */
+    protected static final String SUMMARY_RECIPIENT_EMAIL = "summary.recipientEmail";
 
     protected CMSEngine engine;
 

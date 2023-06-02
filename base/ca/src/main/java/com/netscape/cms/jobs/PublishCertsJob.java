@@ -75,14 +75,14 @@ public class PublishCertsJob extends Job
      */
     protected static String[] mConfigParams =
             new String[] {
-                    "enabled",
-                    "cron",
-                    "summary.enabled",
-                    "summary.emailSubject",
-                    "summary.emailTemplate",
-                    "summary.itemTemplate",
-                    "summary.senderEmail",
-                    "summary.recipientEmail"
+                    ENABLED,
+                    CRON,
+                    SUMMARY_ENABLED,
+                    SUMMARY_EMAIL_SUBJECT,
+                    SUMMARY_EMAIL_TEMPLATE,
+                    SUMMARY_ITEM_TEMPLATE,
+                    SUMMARY_SENDER_EMAIL,
+                    SUMMARY_RECIPIENT_EMAIL
         };
 
     @Override
@@ -127,26 +127,26 @@ public class PublishCertsJob extends Job
         mPublisherProcessor = caEngine.getPublisherProcessor();
 
         // initialize the summary related config info
-        ConfigStore sc = mConfig.getSubStore(PROP_SUMMARY, ConfigStore.class);
-        boolean enabled = sc.getBoolean(PROP_ENABLED, false);
+        ConfigStore sc = mConfig.getSubStore(SUMMARY, ConfigStore.class);
+        boolean enabled = sc.getBoolean(ENABLED, false);
         logger.info("PublishCertsJob: - enabled: " + enabled);
 
         if (enabled) {
             mSummary = true;
 
-            mSummaryMailSubject = sc.getString(PROP_EMAIL_SUBJECT);
+            mSummaryMailSubject = sc.getString(EMAIL_SUBJECT);
             logger.info("PublishCertsJob: - subject: " + mSummaryMailSubject);
 
-            mMailForm = sc.getString(PROP_EMAIL_TEMPLATE);
+            mMailForm = sc.getString(EMAIL_TEMPLATE);
             logger.info("PublishCertsJob: - mail template: " + mMailForm);
 
-            mItemForm = sc.getString(PROP_ITEM_TEMPLATE);
+            mItemForm = sc.getString(ITEM_TEMPLATE);
             logger.info("PublishCertsJob: - item template: " + mItemForm);
 
-            mSummarySenderEmail = sc.getString(PROP_SENDER_EMAIL);
+            mSummarySenderEmail = sc.getString(SENDER_EMAIL);
             logger.info("PublishCertsJob: - sender email: " + mSummarySenderEmail);
 
-            mSummaryReceiverEmail = sc.getString(PROP_RECEIVER_EMAIL);
+            mSummaryReceiverEmail = sc.getString(RECIPIENT_EMAIL);
             logger.info("PublishCertsJob: - receiver email: " + mSummaryReceiverEmail);
 
         } else {
@@ -238,7 +238,7 @@ public class PublishCertsJob extends Job
             } catch (EBaseException e) {
                 negCount += 1;
                 if (mSummary)
-                    buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_FAILURE);
+                    buildItemParams(EmailFormProcessor.TOKEN_STATUS, FAILED);
                 logger.warn("PublishCertsJob: " + CMS.getLogMessage("JOBS_META_INFO_ERROR",
                                 cert.getSerialNumber().toString(16) + e.getMessage()), e);
             }
@@ -251,14 +251,14 @@ public class PublishCertsJob extends Job
             } catch (EBaseException e) {
                 negCount += 1;
                 if (mSummary == true)
-                    buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_FAILURE);
+                    buildItemParams(EmailFormProcessor.TOKEN_STATUS, FAILED);
                 logger.warn("PublishCertsJob: " + CMS.getLogMessage("JOBS_META_REQUEST_ERROR",
                                 cert.getSerialNumber().toString(16) + e.getMessage()), e);
             } catch (NullPointerException e) {
                 // no requestId in MetaInfo...skip to next record
                 negCount += 1;
                 if (mSummary == true)
-                    buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_FAILURE);
+                    buildItemParams(EmailFormProcessor.TOKEN_STATUS, FAILED);
                 logger.warn("PublishCertsJob: " + CMS.getLogMessage("JOBS_META_REQUEST_ERROR",
                                 cert.getSerialNumber().toString(16) + e.getMessage()), e);
             }
@@ -284,7 +284,7 @@ public class PublishCertsJob extends Job
                 } catch (EBaseException e) {
                     negCount += 1;
                     if (mSummary == true)
-                        buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_FAILURE);
+                        buildItemParams(EmailFormProcessor.TOKEN_STATUS, FAILED);
                     logger.warn("PublishCertsJob: " + CMS.getLogMessage("JOBS_FIND_REQUEST_ERROR",
                                     cert.getSerialNumber().toString(16) + e.getMessage()), e);
                 }
@@ -296,7 +296,7 @@ public class PublishCertsJob extends Job
                         mPublisherProcessor.publishCert(cert, req);
 
                         if (mSummary == true)
-                            buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_SUCCESS);
+                            buildItemParams(EmailFormProcessor.TOKEN_STATUS, SUCCEEDED);
                         count += 1;
                     } else {
                         negCount += 1;
@@ -304,7 +304,7 @@ public class PublishCertsJob extends Job
                 } catch (Exception e) {
                     negCount += 1;
                     if (mSummary == true)
-                        buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_FAILURE);
+                        buildItemParams(EmailFormProcessor.TOKEN_STATUS, FAILED);
                     logger.warn("PublishCertsJob: " + CMS.getLogMessage("JOBS_PUBLISH_ERROR",
                                     cert.getSerialNumber().toString(16) + e.getMessage()), e);
                 }
@@ -317,7 +317,7 @@ public class PublishCertsJob extends Job
                         mPublisherProcessor.publishCert(cert, null);
 
                         if (mSummary == true)
-                            buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_SUCCESS);
+                            buildItemParams(EmailFormProcessor.TOKEN_STATUS, SUCCEEDED);
                         count += 1;
                     } else {
                         negCount += 1;
@@ -326,7 +326,7 @@ public class PublishCertsJob extends Job
                     negCount += 1;
 
                     if (mSummary == true)
-                        buildItemParams(EmailFormProcessor.TOKEN_STATUS, STATUS_FAILURE);
+                        buildItemParams(EmailFormProcessor.TOKEN_STATUS, FAILED);
 
                     logger.warn("PublishCertsJob: " + CMS.getLogMessage("JOBS_PUBLISH_ERROR",
                                     cert.getSerialNumber().toString(16) + e.getMessage()), e);
