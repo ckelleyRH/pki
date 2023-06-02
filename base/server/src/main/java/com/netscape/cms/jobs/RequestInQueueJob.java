@@ -76,8 +76,8 @@ public class RequestInQueueJob extends Job
      */
     @Override
     public String[] getExtendedPluginInfo() {
-        String s[] = {
-                IExtendedPluginInfo.HELP_TEXT +
+        return new String[] {
+                HELP_TEXT +
                         "; A job that checks for enrollment requests in the " +
                         "queue, and reports to recipientEmail",
                 "cron;string;Format: minute hour dayOfMonth month " +
@@ -93,11 +93,9 @@ public class RequestInQueueJob extends Job
                         "template file of email to be sent",
                 "subsystemId;choice(ca,ra);The type of subsystem this job is " +
                         "for",
-                IExtendedPluginInfo.HELP_TOKEN +
+                HELP_TOKEN +
                         ";configuration-jobrules-requestinqueuejob",
             };
-
-        return s;
     }
 
     /**

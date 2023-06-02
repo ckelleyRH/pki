@@ -169,12 +169,10 @@ public class RenewalNotificationJob
      */
     @Override
     public String[] getExtendedPluginInfo() {
-        String s[] = {
-                IExtendedPluginInfo.HELP_TEXT +
-                        "; A job that checks for expiring or expired certs" +
+        return new String[] {
+                HELP_TEXT + "; A job that checks for expiring or expired certs" +
                         "notifyTriggerOffset before and notifyEndOffset after " +
                         "the expiration date",
-
                 PROFILE_ID + ";string;Specify the ID of the profile which " +
                         "approved the certificates that are about to expire. For multiple " +
                         "profiles, each entry is separated by white space. For example, " +
@@ -183,8 +181,7 @@ public class RenewalNotificationJob
                         "he should enter \"caServerCert caAgentServerCert\" in the profileId textfield. " +
                         "Blank field means all profiles.",
                 NOTIFY_TRIGGER_OFFSET + ";number,required;How long (in days) before " +
-                        "certificate expiration will the first notification " +
-                        "be sent",
+                        "certificate expiration will the first notification be sent",
                 NOTIFY_END_OFFSET + ";number,required;How long (in days) after " +
                         "certificate expiration will notifications " +
                         "continue to be resent if certificate is not renewed",
@@ -193,10 +190,10 @@ public class RenewalNotificationJob
                 SENDER_EMAIL + ";string,required;Specify the address to be used " +
                         "as the email's 'sender'. Bounces go to this address.",
                 EMAIL_SUBJECT + ";string,required;Email subject",
-                EMAIL_TEMPLATE + ";string,required;Fully qualified pathname of " +
-                        "template file of email to be sent",
-                "enabled;boolean;Enable this plugin",
-                "summary.enabled;boolean;Enabled sending of summaries",
+                EMAIL_TEMPLATE + ";string,required;Fully qualified pathname of template " +
+                        "file of email to be sent",
+                ENABLED + ";boolean;Enable this plugin",
+                SUMMARY_ENABLED + ";boolean;Enabled sending of summaries",
                 SUMMARY_SENDER_EMAIL + ";string,required;Sender email address of summary",
                 SUMMARY_RECIPIENT_EMAIL + ";string,required;Who should receive summaries",
                 SUMMARY_EMAIL_SUBJECT + ";string,required;Subject of summary email",
@@ -204,11 +201,8 @@ public class RenewalNotificationJob
                         "template file of email to be sent",
                 SUMMARY_ITEM_TEMPLATE + ";string,required;Fully qualified pathname of " +
                         "file with template to be used for each summary item",
-                IExtendedPluginInfo.HELP_TOKEN +
-                        ";configuration-jobrules-renewalnotification",
+                HELP_TOKEN + ";configuration-jobrules-renewalnotification",
             };
-
-        return s;
     }
 
     /**

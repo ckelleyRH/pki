@@ -84,29 +84,25 @@ public class UnpublishExpiredJob extends Job
 
     @Override
     public String[] getExtendedPluginInfo() {
-        String s[] = {
-                IExtendedPluginInfo.HELP_TEXT +
-                        "; A job that checks for expired certificates in the " +
+        return new String[] {
+                HELP_TEXT + "; A job that checks for expired certificates in the " +
                         "database, and removes them from the publishing " +
                         "directory",
-                "cron;string;Format: minute hour dayOfMonth month " +
+                CRON + ";string;Format: minute hour dayOfMonth month " +
                         "dayOfWeek. Use '*' for 'every'. For dayOfWeek, 0 is Sunday",
-                "summary.senderEmail;string;Specify the address to be used " +
+                SUMMARY_SENDER_EMAIL + ";string;Specify the address to be used " +
                         "as the email's 'sender'. Bounces go to this address.",
-                "summary.recipientEmail;string;Who should receive summaries",
-                "enabled;boolean;Enable this plugin",
-                "summary.enabled;boolean;Enable the summary. You must enabled " +
+                SUMMARY_RECIPIENT_EMAIL + ";string;Who should receive summaries",
+                ENABLED + ";boolean;Enable this plugin",
+                SUMMARY_ENABLED + ";boolean;Enable the summary. You must enabled " +
                         "this for the job to work.",
-                "summary.emailSubject;string;Subject of summary email",
-                "summary.emailTemplate;string;Fully qualified pathname of " +
+                SUMMARY_EMAIL_SUBJECT + ";string;Subject of summary email",
+                SUMMARY_EMAIL_TEMPLATE + ";string;Fully qualified pathname of " +
                         "template file of email to be sent",
-                "summary.itemTemplate;string;Fully qualified pathname of " +
+                SUMMARY_ITEM_TEMPLATE + ";string;Fully qualified pathname of " +
                         "file containing template for each item",
-                IExtendedPluginInfo.HELP_TOKEN +
-                        ";configuration-jobrules-unpublishexpiredjobs",
+                HELP_TOKEN + ";configuration-jobrules-unpublishexpiredjobs",
             };
-
-        return s;
     }
 
     /**

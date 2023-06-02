@@ -75,7 +75,7 @@ public class PruningJob extends Job implements IExtendedPluginInfo {
     @Override
     public String[] getExtendedPluginInfo() {
         return new String[] {
-                IExtendedPluginInfo.HELP_TEXT +
+                HELP_TEXT +
                         "; A job that removes expired certificates and incomplete requests after" +
                         " the retention period",
                 "cron;string;Format: minute hour dayOfMonth month " +
@@ -89,7 +89,7 @@ public class PruningJob extends Job implements IExtendedPluginInfo {
                 "requestRetentionUnit;integer;Request retention unit: year, month, day (default), hour, minute",
                 "requestSearchSizeLimit;integer;Request search size limit (default: 1000)",
                 "requestSearchTimeLimit;integer;Request search time limit in seconds (default: 0)",
-                IExtendedPluginInfo.HELP_TOKEN + ";configuration-jobrules-pruningjobs",
+                HELP_TOKEN + ";configuration-jobrules-pruningjobs",
         };
     }
 
