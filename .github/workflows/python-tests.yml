@@ -6,12 +6,18 @@ jobs:
   test:
     name: Pylint
     runs-on: ubuntu-latest
+    env:
+      SHARED: /tmp/workdir/pki
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
 
-      - name: Run Python lint
+      - name: Install linters
         run: |
-          pylint-3 --version
-          python3-flake8 --version
+          pip install pylint flake8
+
+      - name: Run linters
+        run: |
+          pylint --version
+          flake8 --version
           /usr/share/pki/tests/bin/pki-lint
