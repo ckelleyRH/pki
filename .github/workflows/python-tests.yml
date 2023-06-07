@@ -3,18 +3,15 @@ name: Python Tests
 on: [push, pull_request]
 
 jobs:
-  init:
-    name: Initialization
-    uses: ./.github/workflows/init.yml
-    secrets: inherit
+  test:
+    name: Pylint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
 
-  build:
-    name: Waiting for build
-    needs: init
-    uses: ./.github/workflows/wait-for-build.yml
-    secrets: inherit
-
-  python-lint-test:
-    name: Python lint
-    needs: [init, build]
-    uses: ./.github/workflows/python-lint-test.yml
+      - name: Run Python lint
+        run: |
+          pylint-3 --version
+          python3-flake8 --version
+          /usr/share/pki/tests/bin/pki-lint
