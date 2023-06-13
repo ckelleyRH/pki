@@ -70,7 +70,7 @@ javadoc(pki-javadoc
         org.dogtagpki
         ${PKI_JAVADOC_SUBPACKAGES}
     CLASSPATH
-        ${SLF4J_API_JAR} ${JAXB_API_JAR}
+        ${SLF4J_API_JAR}
         ${COMMONS_CLI_JAR} ${COMMONS_LANG3_JAR}
         ${COMMONS_CODEC_JAR} ${COMMONS_IO_JAR}
         ${LDAPJDK_JAR}

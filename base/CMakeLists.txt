@@ -157,45 +157,6 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-find_program(XMVN_RESOLVE /bin/xmvn-resolve)
-
-if(XMVN_RESOLVE)
-    execute_process(
-        COMMAND xmvn-resolve jakarta.xml.bind:jakarta.xml.bind-api:4
-        OUTPUT_VARIABLE JAXB_API_JAR
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-else()
-    find_file(JAXB_API_JAR
-        NAMES
-            jaxb-api.jar
-        PATHS
-            /usr/share/java
-    )
-endif(XMVN_RESOLVE)
-
-if(XMVN_RESOLVE)
-    execute_process(
-        COMMAND xmvn-resolve jakarta.activation:jakarta.activation-api:2
-        OUTPUT_VARIABLE JAVAX_ACTIVATION_JAR
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-else()
-    find_file(JAVAX_ACTIVATION_JAR
-        NAMES
-            jakarta.activation.jar
-            jakarta-activation.jar
-            javax.activation.jar
-            javax-activation.jar
-        PATHS
-            /usr/share/java/jakarta-activation
-            /usr/share/java/jakarta
-            /usr/share/java/javax-activation
-            /usr/share/java/javax
-            /usr/share/java
-    )
-endif(XMVN_RESOLVE)
-
 find_file(JAVAX_ANNOTATIONS_API_JAR
     NAMES
         jakarta.annotation-api.jar

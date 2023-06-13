@@ -9,7 +9,7 @@ javac(pki-server-classes
     SOURCES
         src/main/java/*.java
     CLASSPATH
-        ${SLF4J_API_JAR} ${JAXB_API_JAR}
+        ${SLF4J_API_JAR}
         ${COMMONS_CODEC_JAR} ${COMMONS_IO_JAR} ${COMMONS_LANG3_JAR}
         ${COMMONS_CLI_JAR}
         ${HTTPCORE_JAR} ${HTTPCLIENT_JAR}
@@ -129,7 +129,6 @@ add_custom_command(
     COMMAND ln -sf ../../../../../..${JACKSON2_JAXB_ANNOTATIONS_JAR} common/lib/jackson-module-jaxb-annotations.jar
     COMMAND ln -sf ../../../../../..${JAVAX_ACTIVATION_JAR} common/lib/javax.activation.jar
     COMMAND ln -sf ../../../../../..${JAVAX_ANNOTATIONS_API_JAR} common/lib/javax.annotations-api.jar
-    COMMAND ln -sf ../../../../../..${JAXB_API_JAR} common/lib/jaxb-api.jar
     COMMAND ln -sf ../../../../../..${JAXRS_API_JAR} common/lib/jaxrs-api.jar
     COMMAND ln -sf ../../../../../..${JBOSS_LOGGING_JAR} common/lib/jboss-logging.jar
     COMMAND ln -sf ../../../../../..${JSS_JAR} common/lib/jss.jar
