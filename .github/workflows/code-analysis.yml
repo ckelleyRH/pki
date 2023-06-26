@@ -1,6 +1,12 @@
 name: Code Analysis
 on: [push, pull_request]
 
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+  pull-requests: write
+
 jobs:
   init:
     name: Initialization
@@ -77,3 +83,29 @@ jobs:
         with:
           severity: error
           ignore_paths: tests # Don't check legacy test scripts
+
+  TruffleHog:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog OSS
+        id: trufflehog
+        uses: trufflesecurity/trufflehog@v3.41.0
+        continue-on-error: true
+        with:
+          path: ./
+          base: "${{ github.event.repository.default_branch }}"
+          head: HEAD
+          extra_args: --debug
+
+      - name: Scan Results Status
+        if: steps.trufflehog.outcome == 'failure'
+        run: exit 1
+
