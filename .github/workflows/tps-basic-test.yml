@@ -61,17 +61,14 @@ jobs:
               -v
 
           docker exec pki pki-server cert-find
-          docker exec pki curl \
-              -s http://localhost.localdomain:8080/$i/admin/$i/getStatus | \
-              python3 -c \
-                  "import sys, json; \
-                  response = json.load(sys.stdin)['Response']; \
-                  type = response['Type']; \
-                  status = response['Status']; \
-                  state = response['State']; \
-                  print(\"  Checking status of \" + response['ProductVersion'] + \" \" + response['Version'] + \" subsystems:\") \
-                  if type == \"CA\" else print('', end=''); \
-                  print(\"  \" + response['Type'] + \" is \" + response['Status'] + \" with state \" +  response['State']);"
+          docker exec pki RESPONSE=$(curl -s http://localhost.localdomain:8080/ca/admin/ca/getStatus)
+          docker exec pki echo $RESPONSE | jq '.[]'
+          docker exec pki STATE=$(echo $RESPONSE | jq '.[].State' -r)
+          docker exec pki TYPE=$(echo $RESPONSE | jq '.[].Type' -r)
+          docker exec pki STATUS=$(echo $RESPONSE | jq '.[].Status' -r)
+          docker exec pki VERSION=$(echo $RESPONSE | jq '.[].Version' -r)
+          docker exec pki PRODUCT_VERSION=$(echo $RESPONSE | jq '.[].ProductVersion' -r)
+          docker exec pki if [[ ! $STATE -eq 1 || $TYPE != CA || $STATUS != running || $VERSION == null || $PRODUCT_VERSION == null ]]; then exit(1); fi
 
       - name: Install KRA
         run: |
