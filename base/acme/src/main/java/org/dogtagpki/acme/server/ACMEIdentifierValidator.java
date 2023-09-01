@@ -59,12 +59,14 @@ public class ACMEIdentifierValidator {
         }
 
         boolean first = true;
+        boolean hasWildcard = false;
         for (String label : labels) {
             if (first) {
                 first = false;
                 if (label.equals("*") && labels.length > 1) {
                     // wildcard allowed in first label
                     // (as long as it isn't the only label)
+                    hasWildcard = true;
                     continue;
                 }
             }
@@ -91,7 +93,8 @@ public class ACMEIdentifierValidator {
             }
         }
 
-        /* Extra check that URI class is happy with it */
+        /* Extra check that URI class is happy with it (skipped if there is a wildcard as it will fail) */
+        if (hasWildcard) { return ValidationResult.ok(); }
         try {
             new URI("http", value, null, null);
         } catch (URISyntaxException e) {

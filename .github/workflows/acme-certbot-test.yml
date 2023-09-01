@@ -274,6 +274,15 @@ jobs:
           sed -n 's/^ *Subject DN: *\(.*\)/\1/p' output > actual
           diff expected actual
 
+      - name: Enroll client cert with wildcard domain
+        run: |
+          docker exec client certbot certonly \
+              --server http://pki.example.com:8080/acme/directory \
+              -d *.example.com \
+              --key-type rsa \
+              --standalone \
+              --non-interactive
+
       - name: Check ACME orders after enrollment
         run: |
           docker exec ds ldapsearch \
